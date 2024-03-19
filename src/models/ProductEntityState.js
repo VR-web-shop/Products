@@ -12,11 +12,15 @@ export const PRODUCT_ENTITY_STATES = {
     DISCARDED_BY_EMPLOYEE: 'DISCARDED_BY_EMPLOYEE',
 };
 
-const ProductEntityState = Database.define("Product_Entity_State", {
+const ProductEntityState = Database.define("ProductEntityState", {
     name: {
         type: DataTypes.STRING,
         primaryKey: true,  
     }
+}, {
+    underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
 });
 
 export default ProductEntityState;

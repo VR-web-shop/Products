@@ -16,6 +16,10 @@ const Product = Database.define("Product", {
         type: DataTypes.STRING,
         allowNull: false
     },
+}, {
+    underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
 });
 
 Product.hasMany(ProductEntity);

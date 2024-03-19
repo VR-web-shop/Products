@@ -43,7 +43,12 @@ async function findAll(findAllRequest) {
     if (!page) page = 1
     
     const offset = (page - 1) * limit
+    console.log('page', page)
+    console.log('limit', limit)
+    console.log('offset', offset)
     const productEntities = await ProductEntity.findAll({ offset, limit })
+    
+    console.log('productEntities', productEntities)
     const count = await ProductEntity.count()
     const pages = Math.ceil(count / limit)
     const productEntityResponses = productEntities.map(entity => new ProductEntityResponse(entity.dataValues))

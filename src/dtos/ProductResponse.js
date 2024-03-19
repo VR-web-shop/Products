@@ -10,7 +10,7 @@ import DTO from './DTO.js';
  * @property {string} created_at The date the product was created.
  * @property {string} updated_at The date the product was updated.
  */
-const REQUIRED = ['uuid', 'name', 'description', 'createdAt', 'updatedAt'];
+const REQUIRED = ['uuid', 'name', 'description', 'created_at', 'updated_at'];
 export default class ProductResponse extends DTO.DTOBaseClass {
 
     /**

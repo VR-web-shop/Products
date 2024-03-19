@@ -38,8 +38,14 @@ class FindAllRequest extends DTO.DTOBaseClass {
     constructor(quries) {
         super(quries, ['page', 'limit'], ['limit'], DTO.TYPES.REQUEST);
 
+        this.limit = parseInt(this.limit);
+
         if (this.limit < 0) {
             throw new DTORequestParameterError('limit must be a positive integer');
+        }
+
+        if (this.page) {
+            this.page = parseInt(this.page); 
         }
 
         if (this.page && this.page < 0) {
