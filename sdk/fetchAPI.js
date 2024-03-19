@@ -3,20 +3,25 @@ import SDKFetchMissingTokenError from './errors/SDKFetchMissingTokenError.js';
 
 const apiPath = '/api/';
 let apiVersion = 'v1';
-let refreshMethod = null;
+let authAPIVersion = 'v1';
 let serverURL = 'http://localhost:5173';
+let authServerURL = 'http://localhost:5172';
 let tokenLocalStorageKey = 'auth';
 
 function setServerURL(url) {
     serverURL = url;
 }
 
-function setRefreshMethod(method) {
-    refreshMethod = method;
+function setAuthServerURL(url) {
+    authServerURL = url;
 }
 
 function getAuthToken() {
     return localStorage.getItem(tokenLocalStorageKey);
+}
+
+function setAuthToken(token) {
+    localStorage.setItem(tokenLocalStorageKey, token);
 }
 
 function setAuthTokenKey(key) {
@@ -25,6 +30,10 @@ function setAuthTokenKey(key) {
 
 function setAPIVersion(version) {
     apiVersion = version;
+}
+
+function setAuthAPIVersion(version) {
+    authAPIVersion = version;
 }
 
 /**
@@ -74,7 +83,13 @@ async function request(endpoint, options, useAuth = false, refreshes = 0) {
         const isUnauthorized = status === 401 || status === 403 || status === 419;
         if (isUnauthorized && refreshes < 1) {
             if (refreshMethod) {
-                await refreshMethod();
+                const response = await fetchAPI.request(`${authServerURL}${apiPath}${apiVersion}/auth`, {
+                    method: 'PUT',
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                setAuthToken(data.access_token);
             }
 
             return request(endpoint, options, useAuth, refreshes + 1);
@@ -92,5 +107,7 @@ export default {
     request,
     setAuthTokenKey,
     getAuthToken,
-    setAPIVersion
+    setAPIVersion,
+    setAuthServerURL,
+    setAuthAPIVersion
 }

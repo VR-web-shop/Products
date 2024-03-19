@@ -21,18 +21,20 @@ import productEntityStates from "./api/productEntityStates.js";
  * @param {string} serverURL The server URL
  * @param {string} APIVersion The API version
  * @param {object} options The options
+ * @param {object} options The options
  * @returns {object} The SDK object
  * @throws {Error} If serverURL is not provided
- * @example const s = new SDK('http://localhost:3002', 'v1, { authTokenKey: 'auth' });
+ * @example const s = new SDK('http://localhost:3002', 'v1', 'http://localhost:3003', 'v1', { authTokenKey: 'auth', authRefreshMethod: () => {} });
  */
-const SDK = function(serverURL, APIVersion = 'v1', options={}) {
+const SDK = function(serverURL, APIVersion = 'v1', AuthServerURL = '', AuthAPIVersion = 'v1', options={}) {
     if (!serverURL) {
         throw new Error('serverURL is required');
     }
 
     fetchAPI.setServerURL(serverURL);
     fetchAPI.setAPIVersion(APIVersion);
-    fetchAPI.setRefreshMethod(authentication.refresh);
+    fetchAPI.setAuthServerURL(AuthServerURL);
+    fetchAPI.setAuthAPIVersion(AuthAPIVersion);
 
     if (options.authTokenKey) {
         fetchAPI.setAuthTokenKey(options.authTokenKey);
