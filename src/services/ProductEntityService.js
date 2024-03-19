@@ -26,7 +26,7 @@ async function find(findRequest) {
         throw new ServiceEntityNotFound(`ProductEntity with UUID ${uuid} not found`);
     }
 
-    return new ProductEntityResponse(productEntity);
+    return new ProductEntityResponse(productEntity.dataValues);
 }
 
 /**
@@ -109,16 +109,16 @@ async function update(updateRequest) {
 /**
  * @function destroy
  * @description Destroys a product entity.
- * @param {ProductEntityRequest.DestroyRequest} destroyRequest The destroy request.
+ * @param {ProductEntityRequest.DeleteRequest} deleteRequest The destroy request.
  * @throws {ServiceArgumentError} If the destroy request is not provided.
  * @throws {ServiceEntityNotFound} If the product entity is not found.
  */
-async function destroy(destroyRequest) {
-    if (!(destroyRequest instanceof ProductEntityRequest.DestroyRequest)) {
-        throw new ServiceArgumentError('destroyRequest must be an instance of ProductEntityRequest.DestroyRequest');
+async function destroy(deleteRequest) {
+    if (!(deleteRequest instanceof ProductEntityRequest.DeleteRequest)) {
+        throw new ServiceArgumentError('destroyRequest must be an instance of ProductEntityRequest.DeleteRequest');
     }
 
-    const { uuid } = destroyRequest;
+    const { uuid } = deleteRequest;
     const productEntity = await ProductEntity.findOne({ where: { uuid } });
 
     if (!productEntity) {

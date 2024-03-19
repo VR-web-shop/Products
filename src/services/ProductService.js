@@ -84,31 +84,32 @@ async function update(updateRequest) {
 
     const { uuid, name, description } = updateRequest;
     const product = await Product.findOne({ where: { uuid } });
-
+    
     if (!product) {
         throw new ServiceEntityNotFound(`Product with UUID ${uuid} not found`);
     }
     
-    if (!name) product.name = name;
-    if (!description) product.description = description;
+    console.log(name, description);
+    if (name) product.name = name;
+    if (description) product.description = description;
     await product.save();
-    
+    console.log(product);
     return new ProductResponse(product.dataValues);
 }
 
 /**
  * @function destroy
  * @description Destroys a product.
- * @param {ProductRequest.DestroyRequest} destroyRequest The destroy request.
+ * @param {ProductRequest.DeleteRequest} deleteRequest The destroy request.
  * @throws {ServiceArgumentError} If the destroy request is not provided.
  * @throws {ServiceEntityNotFound} If the product is not found.
  */
-async function destroy(destroyRequest) {
-    if (!(destroyRequest instanceof ProductRequest.DeleteRequest)) {
+async function destroy(deleteRequest) {
+    if (!(deleteRequest instanceof ProductRequest.DeleteRequest)) {
         throw new ServiceArgumentError('destroyRequest must be an instance of ProductRequest.DeleteRequest');
     }
 
-    const { uuid } = destroyRequest;
+    const { uuid } = deleteRequest;
     const product = await Product.findOne({ where: { uuid } });
 
     if (!product) {

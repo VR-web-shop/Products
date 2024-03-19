@@ -92,7 +92,7 @@ class UpdateRequest extends DTO.DTOBaseClass {
      * @throws {DTORequestParameterError} If the body does not have a uuid.
      */
     constructor(body) {
-        super(body, ['uuid'], ['uuid'], DTO.TYPES.REQUEST);
+        super(body, ['uuid', 'name', 'description'], ['uuid'], DTO.TYPES.REQUEST);
     }
 }
 
