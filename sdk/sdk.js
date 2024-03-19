@@ -2,6 +2,7 @@ import ProductRequest from "../src/dtos/ProductRequest.js";
 import ProductResponse from "../src/dtos/ProductResponse.js";
 import ProductEntityRequest from "../src/dtos/ProductEntityRequest.js";
 import ProductEntityResponse from "../src/dtos/ProductEntityResponse.js";
+import ProductEntityStateRequest from "../src/dtos/ProductEntityStateRequest.js";
 import ProductEntityStateResponse from "../src/dtos/ProductEntityStateResponse.js";
 
 import SDKFetchError from "./errors/SDKFetchError.js";
@@ -73,7 +74,8 @@ const SDK = function(serverURL, APIVersion = 'v1', AuthServerURL = '', AuthAPIVe
      */
     this.requests = {
         ProductRequest,
-        ProductEntityRequest
+        ProductEntityRequest,
+        ProductEntityStateRequest
     }
 
     /**
