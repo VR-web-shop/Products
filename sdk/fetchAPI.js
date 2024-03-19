@@ -103,7 +103,6 @@ async function request(endpoint, options, useAuth = false, refreshes = 0) {
 
 export default {
     setServerURL,
-    setRefreshMethod,
     request,
     setAuthTokenKey,
     getAuthToken,
