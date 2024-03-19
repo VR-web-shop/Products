@@ -1,3 +1,6 @@
+import ServiceArgumentError from "./errors/ServiceArgumentError.js";
+import ServiceEntityNotFound from "./errors/ServiceEntityNotFound.js";
+
 import ProductEntityState from "../models/ProductEntityState.js";
 import ProductEntityStateRequest from "../dtos/ProductEntityStateRequest.js";
 import ProductEntityStateResponse from "../dtos/ProductEntityStateResponse.js";
@@ -11,8 +14,8 @@ import ProductEntityStateResponse from "../dtos/ProductEntityStateResponse.js";
  * @throws {ServiceEntityNotFound} If the product entity is not found.
  */
 async function find(findRequest) {
-    if (!(findRequest instanceof ProductEntityRequest.FindRequest)) {
-        throw new ServiceArgumentError('findRequest must be an instance of ProductEntityRequest.FindRequest');
+    if (!(findRequest instanceof ProductEntityStateRequest.FindRequest)) {
+        throw new ServiceArgumentError('findRequest must be an instance of ProductEntityStateRequest.FindRequest');
     }
 
     const { name } = findRequest;
@@ -46,7 +49,7 @@ async function findAll(findAllRequest) {
     const pages = Math.ceil(count / limit)
     const productEntityStateResponses = productEntityStates.map(state => new ProductEntityStateResponse(state.dataValues))
 
-    return { productEntityStates: productEntityStateResponses, pages }
+    return { product_entity_states: productEntityStateResponses, pages }
 }
 
 export default {

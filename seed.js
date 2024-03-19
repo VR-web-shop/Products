@@ -34,7 +34,7 @@ import ProductEntityState, { PRODUCT_ENTITY_STATES } from './src/models/ProductE
 
     await ProductEntity.create({
         ProductUuid: product.uuid,
-        ProductEntityStateName: PRODUCT_ENTITY_STATES.RESERVERED_BT_CUSTOMER_ORDER
+        ProductEntityStateName: PRODUCT_ENTITY_STATES.RESERVERED_BY_CUSTOMER_ORDER
     });
 
     await ProductEntity.create({

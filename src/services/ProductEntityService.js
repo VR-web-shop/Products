@@ -3,6 +3,8 @@ import ServiceEntityNotFound from "./errors/ServiceEntityNotFound.js";
 import ProductEntityRequest from "../dtos/ProductEntityRequest.js";
 import ProductEntityResponse from "../dtos/ProductEntityResponse.js";
 import ProductEntity from "../models/ProductEntity.js";
+import Product from "../models/Product.js";
+import { PRODUCT_ENTITY_STATES } from "../models/ProductEntityState.js";
 
 /**
  * @function find
@@ -43,17 +45,12 @@ async function findAll(findAllRequest) {
     if (!page) page = 1
     
     const offset = (page - 1) * limit
-    console.log('page', page)
-    console.log('limit', limit)
-    console.log('offset', offset)
     const productEntities = await ProductEntity.findAll({ offset, limit })
-    
-    console.log('productEntities', productEntities)
     const count = await ProductEntity.count()
     const pages = Math.ceil(count / limit)
     const productEntityResponses = productEntities.map(entity => new ProductEntityResponse(entity.dataValues))
 
-    return { productEntities: productEntityResponses, pages }
+    return { product_entities: productEntityResponses, pages }
 }
 
 /**
@@ -69,9 +66,14 @@ async function create(createRequest) {
     }
 
     const { product_uuid } = createRequest;
-    const productEntity = await ProductEntity.create({ product_uuid });
 
-    return new ProductEntityResponse(productEntity);
+    if (product_uuid && !await Product.findOne({ where: { uuid: product_uuid } })) {
+        throw new ServiceEntityNotFound(`Product with UUID ${product_uuid} not found`);
+    }
+
+    const productEntity = await ProductEntity.create({ product_uuid, product_entity_state_name: PRODUCT_ENTITY_STATES.WAITING_FOR_EMPLOYEE_COMPLETION });
+
+    return new ProductEntityResponse(productEntity.dataValues);
 }
 
 /**
@@ -87,17 +89,21 @@ async function update(updateRequest) {
         throw new ServiceArgumentError('updateRequest must be an instance of ProductEntityRequest.UpdateRequest');
     }
 
-    const { uuid, productUuid } = updateRequest;
+    const { uuid, product_uuid } = updateRequest;
     const productEntity = await ProductEntity.findOne({ where: { uuid } });
 
     if (!productEntity) {
         throw new ServiceEntityNotFound(`ProductEntity with UUID ${uuid} not found`);
     }
 
-    productEntity.productUuid = productUuid;
+    if (product_uuid && !await Product.findOne({ where: { uuid: product_uuid } })) {
+        throw new ServiceEntityNotFound(`Product with UUID ${product_uuid} not found`);
+    }
+
+    productEntity.product_uuid = product_uuid;
     await productEntity.save();
 
-    return new ProductEntityResponse(productEntity);
+    return new ProductEntityResponse(productEntity.dataValues);
 }
 
 /**

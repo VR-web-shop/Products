@@ -5,7 +5,7 @@ import DTO from './DTO.js';
  * @classdesc ProductEntityResponse class is a DTO class that
  * represents the response of the product entity.
  * @property {string} uuid The uuid of the product entity.
- * @property {string} state The name of the product entity state.
+ * @property {string} product_entity_state_name The name of the product entity state.
  * @property {string} product_uuid The uuid of the product.
  * @property {string} created_at The date the product entity was created.
  * @property {string} updated_at The date the product entity was updated.

@@ -24,7 +24,7 @@ async function find(findRequest) {
         throw new ServiceEntityNotFound(`Product with UUID ${uuid} not found`);
     }
 
-    return new ProductResponse(product);
+    return new ProductResponse(product.dataValues);
 }
 
 /**
@@ -66,7 +66,7 @@ async function create(createRequest) {
     const { name, description } = createRequest;
     const product = await Product.create({ name, description });
 
-    return new ProductResponse(product);
+    return new ProductResponse(product.dataValues);
 }
 
 /**
@@ -93,7 +93,7 @@ async function update(updateRequest) {
     if (!description) product.description = description;
     await product.save();
     
-    return new ProductResponse(product);
+    return new ProductResponse(product.dataValues);
 }
 
 /**

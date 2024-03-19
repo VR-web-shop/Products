@@ -14,7 +14,7 @@ const ProductEntity = Database.define("ProductEntity", {
     updatedAt: 'updated_at',
 });
 
-ProductEntity.belongsTo(ProductEntityState);
+ProductEntity.belongsTo(ProductEntityState, { foreignKey: 'product_entity_state_name', targetKey: 'name' });
 ProductEntityState.hasMany(ProductEntity);
 
 export default ProductEntity;

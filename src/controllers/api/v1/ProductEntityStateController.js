@@ -104,8 +104,8 @@ router.route('/api/v1/product_entity_states')
     .get(MiddlewareJWT.AuthorizePermissionJWT('product-entity-states:index'), async (req, res) => {
         try {
             const request = new ProductEntityStateService.ProductEntityStateRequest.FindAllRequest(req.query)
-            const response = await ProductEntityStateService.findAll()
-            res.send(response)
+            const {product_entity_states, pages} = await ProductEntityStateService.findAll(request)
+            res.send({product_entity_states, pages})
         } catch (error) {
             if (error instanceof APIActorError) {
                 return res.status(error.statusCode).send({ message: error.message })
