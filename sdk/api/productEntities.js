@@ -4,8 +4,8 @@ import crudAPI from '../crudAPI.js';
 
 const FOREIGN_KEY = 'uuid';
 const ENTITIES_KEY = 'product_entities';
-const ENDPOINT_SINGLE = 'admin/product_entities';
-const ENDPOINT_MULTIPLE = 'admin/product_entities';
+const ENDPOINT_SINGLE = 'product_entities';
+const ENDPOINT_MULTIPLE = 'product_entities';
 const REQUEST = ProductEntityRequest;
 const RESPONSE = ProductEntityResponse;
 
