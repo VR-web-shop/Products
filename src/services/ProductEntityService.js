@@ -71,7 +71,7 @@ async function create(createRequest) {
         throw new ServiceEntityNotFound(`Product with UUID ${product_uuid} not found`);
     }
 
-    const productEntity = await ProductEntity.create({ product_uuid, product_entity_state_name: PRODUCT_ENTITY_STATES.WAITING_FOR_EMPLOYEE_COMPLETION });
+    const productEntity = await ProductEntity.create({ product_uuid, product_entity_state_name: PRODUCT_ENTITY_STATES.AVAILABLE_FOR_PURCHASE });
 
     return new ProductEntityResponse(productEntity.dataValues);
 }

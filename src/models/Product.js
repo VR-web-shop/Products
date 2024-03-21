@@ -17,6 +17,7 @@ const Product = Database.define("Product", {
         allowNull: false
     },
 }, {
+    paranoid: true,
     underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',

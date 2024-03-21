@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import './src/config/BrokerConfig.js'
 import express from 'express';
 import cors from 'cors';
 
@@ -9,9 +10,7 @@ import SwaggerController from './src/controllers/SwaggerController.js';
 
 const app = express();
 
-app.use(cors({
-    origin: 'http://localhost:5173', // Allow requests from any origin
-}));
+app.use(cors({origin: '*'}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
