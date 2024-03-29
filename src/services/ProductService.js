@@ -3,6 +3,7 @@ import ServiceEntityNotFound from "./errors/ServiceEntityNotFound.js";
 import ProductRequest from "../dtos/ProductRequest.js";
 import ProductResponse from "../dtos/ProductResponse.js";
 import Product from "../models/Product.js";
+import { sendMessage } from '../config/BrokerConfig.js'
 
 /**
  * @function find
@@ -65,8 +66,12 @@ async function create(createRequest) {
 
     const { name, description } = createRequest;
     const product = await Product.create({ name, description });
+    const response = new ProductResponse(product.dataValues);
 
-    return new ProductResponse(product.dataValues);
+    sendMessage('scenes_new_product', response);
+    sendMessage('shopping_cart_new_product', response);
+
+    return response;
 }
 
 /**

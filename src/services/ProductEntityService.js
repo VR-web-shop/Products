@@ -5,6 +5,7 @@ import ProductEntityResponse from "../dtos/ProductEntityResponse.js";
 import ProductEntity from "../models/ProductEntity.js";
 import Product from "../models/Product.js";
 import { PRODUCT_ENTITY_STATES } from "../models/ProductEntityState.js";
+import { sendMessage } from '../config/BrokerConfig.js'
 
 /**
  * @function find
@@ -48,6 +49,7 @@ async function findAll(findAllRequest) {
     const productEntities = await ProductEntity.findAll({ offset, limit })
     const count = await ProductEntity.count()
     const pages = Math.ceil(count / limit)
+    console.log('productEntities', productEntities)
     const productEntityResponses = productEntities.map(entity => new ProductEntityResponse(entity.dataValues))
 
     return { product_entities: productEntityResponses, pages }
@@ -72,8 +74,12 @@ async function create(createRequest) {
     }
 
     const productEntity = await ProductEntity.create({ product_uuid, product_entity_state_name: PRODUCT_ENTITY_STATES.AVAILABLE_FOR_PURCHASE });
+    const response = new ProductEntityResponse(productEntity.dataValues)
 
-    return new ProductEntityResponse(productEntity.dataValues);
+    sendMessage('scenes_new_product_entity', response)
+    sendMessage('shopping_cart_new_product_entity', response)
+
+    return response;
 }
 
 /**
