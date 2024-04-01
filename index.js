@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import './src/config/BrokerConfig.js'
+import { connect } from './src/config/BrokerConfig.js';
 import express from 'express';
 import cors from 'cors';
 
@@ -8,17 +8,21 @@ import ProductEntityController from './src/controllers/api/v1/ProductEntityContr
 import ProductEntityStateController from './src/controllers/api/v1/ProductEntityStateController.js';
 import SwaggerController from './src/controllers/SwaggerController.js';
 
-const app = express();
+(async () => {
+    await connect();
 
-app.use(cors({origin: '*'}));
+    const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(SwaggerController);
-app.use(ProductController);
-app.use(ProductEntityController);
-app.use(ProductEntityStateController);
+    app.use(cors({origin: '*'}));
 
-app.listen(process.env.SERVER_PORT, () => {
-    console.log(`Server is running on port ${process.env.SERVER_PORT}`);
-});
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
+    app.use(SwaggerController);
+    app.use(ProductController);
+    app.use(ProductEntityController);
+    app.use(ProductEntityStateController);
+
+    app.listen(process.env.SERVER_PORT, () => {
+        console.log(`Server is running on port ${process.env.SERVER_PORT}`);
+    });
+})();
