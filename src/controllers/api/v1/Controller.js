@@ -5,6 +5,7 @@ import Product from "../../../models/Product.js";
 import ProductEntity from "../../../models/ProductEntity.js";
 import ProductEntityState from "../../../models/ProductEntityState.js";
 
+import StorageConfig from "../../../config/StorageConfig.js";
 import { sendMessage } from "../../../config/BrokerConfig.js";
 
 const prefix = '/api/v1/';
@@ -32,7 +33,7 @@ export default {
             includes: ['ProductEntity']
         },
         create: { 
-            properties: ['name', 'description'], 
+            properties: ['name', 'description', 'price'], 
             middleware: [
                 MiddlewareJWT.AuthorizeJWT, 
                 MiddlewareJWT.AuthorizePermissionJWT('products:create')
@@ -56,6 +57,10 @@ export default {
                 MiddlewareJWT.AuthorizeJWT, 
                 MiddlewareJWT.AuthorizePermissionJWT('products:delete')
             ],
+        },
+        upload: {
+            fields: ['thumbnail_source'],
+            s3: { prefix: 'assets/products/thumbnails/', ...StorageConfig }
         },
         debug
     }),
