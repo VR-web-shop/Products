@@ -3,7 +3,12 @@ import MiddlewareJWT from "../../../jwt/MiddlewareJWT.js";
 
 import Product from "../../../models/Product.js";
 import ProductEntity from "../../../models/ProductEntity.js";
-import ProductEntityState from "../../../models/ProductEntityState.js";
+import ProductEntityState, { PRODUCT_ENTITY_STATES } from "../../../models/ProductEntityState.js";
+import ProductOrder from "../../../models/ProductOrder.js";
+import ProductOrderEntity from "../../../models/ProductOrderEntity.js";
+import ProductOrderState, { PRODUCT_ORDER_STATES } from "../../../models/ProductOrderState.js";
+import DeliverOption, { DELIVER_OPTIONS } from "../../../models/DeliverOption.js";
+import PaymentOption, { PAYMENT_OPTIONS } from "../../../models/PaymentOption.js";
 
 import StorageConfig from "../../../config/StorageConfig.js";
 import { sendMessage } from "../../../config/BrokerConfig.js";
@@ -127,6 +132,91 @@ export default {
             ], 
             findProperties: ['name'],
             whereProperties: ['name'],
+        },
+        debug
+    }),
+
+    ProductOrderController: RestController(`${prefix}product_orders`, 'uuid', ProductOrder, {
+        find: {
+            middleware: [],
+            includes: ['ProductOrderState', 'ProductOrderEntity'],
+        },
+        findAll: {
+            middleware: [],
+            findProperties: ['uuid', 'cart_uuid', 'product_order_state_name'],
+            whereProperties: ['uuid', 'cart_uuid', 'product_order_state_name'],
+            includes: ['ProductOrderState', 'ProductOrderEntity'],
+        },
+        update: {
+            properties: ['name', 'email', 'address', 'city', 'country', 'postal_code', 'deliver_option_name', 'payment_option_name', 'cart_uuid'],
+            middleware: [],
+            hooks: {
+                after: async (req, res, params, entity) => {
+                }
+            }
+        },
+        delete: {
+            middleware: [],
+            hooks: {
+                after: async (req, res, params, entity) => {
+                }
+            }
+        },
+        debug
+    }),
+
+    ProductOrderEntityController: RestController(`${prefix}product_order_entities`, 'uuid', ProductOrderEntity, {
+        find: {
+            middleware: [],
+            includes: ['ProductOrder', 'ProductEntity'],
+        },
+        findAll: {
+            middleware: [],
+            findProperties: ['uuid'],
+            whereProperties: ['uuid'],
+            includes: ['ProductOrder', 'ProductEntity'],
+        },
+        debug
+    }),
+
+    ProductOrderStateController: RestController(`${prefix}product_order_states`, 'name', ProductOrderState, {
+        find: {
+            middleware: [],
+            includes: ['ProductOrder'],
+        },
+        findAll: {
+            middleware: [],
+            findProperties: ['name'],
+            whereProperties: ['name'],
+            includes: ['ProductOrder'],
+        },
+        debug
+    }),
+
+    DeliverOptionController: RestController(`${prefix}deliver_options`, 'name', DeliverOption, {
+        find: {
+            middleware: [],
+            includes: ['ProductOrder'],
+        },
+        findAll: {
+            middleware: [],
+            findProperties: ['name'],
+            whereProperties: ['name'],
+            includes: ['ProductOrder'],
+        },
+        debug
+    }),
+
+    PaymentOptionController: RestController(`${prefix}payment_options`, 'name', PaymentOption, {
+        find: {
+            middleware: [],
+            includes: ['ProductOrder'],
+        },
+        findAll: {
+            middleware: [],
+            findProperties: ['name'],
+            whereProperties: ['name'],
+            includes: ['ProductOrder'],
         },
         debug
     }),

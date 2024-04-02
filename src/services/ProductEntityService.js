@@ -49,7 +49,7 @@ async function findAll(findAllRequest) {
     const productEntities = await ProductEntity.findAll({ offset, limit })
     const count = await ProductEntity.count()
     const pages = Math.ceil(count / limit)
-    console.log('productEntities', productEntities)
+
     const productEntityResponses = productEntities.map(entity => new ProductEntityResponse(entity.dataValues))
 
     return { product_entities: productEntityResponses, pages }
@@ -74,12 +74,11 @@ async function create(createRequest) {
     }
 
     const productEntity = await ProductEntity.create({ product_uuid, product_entity_state_name: PRODUCT_ENTITY_STATES.AVAILABLE_FOR_PURCHASE });
-    const response = new ProductEntityResponse(productEntity.dataValues)
 
-    sendMessage('scenes_new_product_entity', response)
-    sendMessage('shopping_cart_new_product_entity', response)
+    sendMessage('scenes_new_product_entity', productEntity.dataValues)
+    sendMessage('shopping_cart_new_product_entity', productEntity.dataValues)
 
-    return response;
+    return new ProductEntityResponse(productEntity.dataValues);
 }
 
 /**
@@ -106,10 +105,12 @@ async function update(updateRequest) {
         throw new ServiceEntityNotFound(`Product with UUID ${product_uuid} not found`);
     }
 
-    productEntity.product_uuid = product_uuid;
-    await productEntity.save();
+    const result = await productEntity.update({ product_uuid });
 
-    return new ProductEntityResponse(productEntity.dataValues);
+    sendMessage('scenes_update_product_entity', result.dataValues)
+    sendMessage('shopping_cart_update_product_entity', result.dataValues)
+
+    return new ProductEntityResponse(result.dataValues);
 }
 
 /**
@@ -132,6 +133,9 @@ async function destroy(deleteRequest) {
     }
 
     await productEntity.destroy();
+
+    sendMessage('scenes_delete_product_entity', productEntity.dataValues)
+    sendMessage('shopping_cart_delete_product_entity', productEntity.dataValues)
 }
 
 export default {

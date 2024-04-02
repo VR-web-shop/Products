@@ -66,12 +66,11 @@ async function create(createRequest) {
 
     const { name, description } = createRequest;
     const product = await Product.create({ name, description });
-    const response = new ProductResponse(product.dataValues);
 
-    sendMessage('scenes_new_product', response);
-    sendMessage('shopping_cart_new_product', response);
+    sendMessage('scenes_new_product', product.dataValues);
+    sendMessage('shopping_cart_new_product', product.dataValues);
 
-    return response;
+    return new ProductResponse(product.dataValues);
 }
 
 /**
@@ -93,13 +92,17 @@ async function update(updateRequest) {
     if (!product) {
         throw new ServiceEntityNotFound(`Product with UUID ${uuid} not found`);
     }
-    
-    console.log(name, description);
-    if (name) product.name = name;
-    if (description) product.description = description;
-    await product.save();
-    console.log(product);
-    return new ProductResponse(product.dataValues);
+
+    const p = {};
+    if (name) p.name = name;
+    if (description) p.description = description;
+
+    const result = await product.update(p);
+
+    sendMessage('scenes_update_product', result.dataValues);
+    sendMessage('shopping_cart_update_product', result.dataValues);
+
+    return new ProductResponse(result.dataValues);
 }
 
 /**
@@ -122,6 +125,9 @@ async function destroy(deleteRequest) {
     }
 
     await product.destroy();
+
+    sendMessage('scenes_delete_product', product.dataValues);
+    sendMessage('shopping_cart_delete_product', product.dataValues);
 }
 
 export default {
