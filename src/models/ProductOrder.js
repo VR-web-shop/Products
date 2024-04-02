@@ -37,36 +37,6 @@ const ProductOrder = Database.define("ProductOrder", {
         allowNull: false
     },
 }, {
-    hooks: {
-        beforeCreate: async (productOrder) => {
-            if (!productOrder.dataValues.product_order_state_name) {
-                productOrder.dataValues.product_order_state_name = PRODUCT_ORDER_STATES.WAITING_FOR_PAYMENT;
-            }
-            
-    
-            const cart = await Cart.findOne({ where: { uuid: productOrder.dataValues.cart_uuid }, include: [
-                { model: ProductEntity, as: 'ProductEntity' }            
-            ]});
-            for (const productEntity of cart.ProductEntity) {
-                await ProductOrderEntity.create({
-                    product_order_uuid: productOrder.dataValues.uuid,
-                    product_entity_uuid: productEntity.dataValues.uuid
-                });
-            }
-        },
-        beforeUpdate: async (productOrder) => {
-            await ProductOrderEntity.destroy({ where: { product_order_uuid: productOrder.dataValues.uuid } });
-            const cart = await Cart.findOne({ where: { uuid: productOrder.dataValues.cart_uuid }, include: [
-                { model: ProductEntity, as: 'ProductEntity' }            
-            ]});
-            for (const productEntity of cart.ProductEntity) {
-                await ProductOrderEntity.create({
-                    product_order_uuid: productOrder.dataValues.uuid,
-                    product_entity_uuid: productEntity.dataValues.uuid
-                });
-            }
-        }
-    },
     paranoid: true,
     underscored: true,
     createdAt: 'created_at',

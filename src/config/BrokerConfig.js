@@ -67,6 +67,7 @@ export const connect = async () => {
      */
     addListener('products_update_product_order', async (msg) => {
         const { productOrder, productOrderEntities } = msg;
+        productOrder.ProductOrderStateName = productOrder.product_order_state_name;
         // Delete all product order entities
         await ProductOrderEntity.destroy({ where: { product_order_uuid: productOrder.uuid } });
         // Update the product order

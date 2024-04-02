@@ -166,7 +166,13 @@ export default {
                 MiddlewareJWT.AuthorizeJWT, 
                 MiddlewareJWT.AuthorizePermissionJWT('product-orders:show')
             ],
-            includes: ['ProductOrderState', 'ProductOrderEntity'],
+            includes: [
+                { endpoint: 'product_order_entities', model: 'ProductOrderEntities' },
+                { endpoint: 'product_order_states', model: 'ProductOrderState' },
+                { endpoint: 'deliver_options', model: 'DeliverOption' },
+                { endpoint: 'payment_options', model: 'PaymentOption' },
+                { endpoint: 'product_entities', model: 'ProductEntities' }
+            ]
         },
         findAll: {
             middleware: [
@@ -178,13 +184,43 @@ export default {
             includes: ['ProductOrderState', 'ProductOrderEntity'],
         },
         update: {
-            properties: ['name', 'email', 'address', 'city', 'country', 'postal_code', 'deliver_option_name', 'payment_option_name', 'cart_uuid'],
+            properties: ['name', 'email', 'address', 'city', 'country', 'product_order_state_name', 'postal_code', 'deliver_option_name', 'payment_option_name', 'cart_uuid'],
             middleware: [
                 MiddlewareJWT.AuthorizeJWT, 
                 MiddlewareJWT.AuthorizePermissionJWT('product-orders:update')
             ],
             hooks: {
                 after: async (req, res, params, entity) => {
+                    if (entity.product_order_state_name === PRODUCT_ORDER_STATES.DISCARDED_BY_EMPLOYEE) {
+                        const productOrderEntities = await ProductOrderEntity.findAll({ where: { product_order_uuid: entity.uuid } })
+                        const productEntities = await ProductEntity.findAll({ where: { uuid: productOrderEntities.map(poe => poe.product_entity_uuid) } })
+                        for (const productEntity of productEntities) {
+                            await productEntity.update({ product_entity_state_name: PRODUCT_ENTITY_STATES.AVAILABLE_FOR_PURCHASE })
+                            sendMessage('scenes_update_product_entity', productEntity)
+                            sendMessage('shopping_cart_update_product_entity', productEntity)
+                        }
+                    }
+
+                    else if (entity.product_order_state_name === PRODUCT_ORDER_STATES.SHIPPED_TO_CUSTOMER) {
+                        const productOrderEntities = await ProductOrderEntity.findAll({ where: { product_order_uuid: entity.uuid } })
+                        const productEntities = await ProductEntity.findAll({ where: { uuid: productOrderEntities.map(poe => poe.product_entity_uuid) } })
+                        for (const productEntity of productEntities) {
+                            await productEntity.update({ product_entity_state_name: PRODUCT_ENTITY_STATES.SHIPPED_TO_CUSTOMER })
+                            sendMessage('scenes_update_product_entity', productEntity)
+                            sendMessage('shopping_cart_update_product_entity', productEntity)
+                        }
+                    }
+
+                    else if (entity.product_order_state_name === PRODUCT_ORDER_STATES.DELIVERED_TO_CUSTOMER) {
+                        const productOrderEntities = await ProductOrderEntity.findAll({ where: { product_order_uuid: entity.uuid } })
+                        const productEntities = await ProductEntity.findAll({ where: { uuid: productOrderEntities.map(poe => poe.product_entity_uuid) } })
+                        for (const productEntity of productEntities) {
+                            await productEntity.update({ product_entity_state_name: PRODUCT_ENTITY_STATES.DELIVERED_TO_CUSTOMER })
+                            sendMessage('scenes_update_product_entity', productEntity)
+                            sendMessage('shopping_cart_update_product_entity', productEntity)
+                        }
+                    }
+
                     sendMessage('shopping_cart_update_product_order', entity)
                 }
             }
@@ -216,8 +252,8 @@ export default {
                 MiddlewareJWT.AuthorizeJWT, 
                 MiddlewareJWT.AuthorizePermissionJWT('product-order-entities:index')
             ],
-            findProperties: ['uuid'],
-            whereProperties: ['uuid'],
+            findProperties: ['uuid', 'product_order_uuid'],
+            whereProperties: ['uuid', 'product_order_uuid'],
             includes: ['ProductOrder', 'ProductEntity'],
         },
         debug
