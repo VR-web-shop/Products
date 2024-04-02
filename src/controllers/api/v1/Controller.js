@@ -56,12 +56,24 @@ export default {
                 MiddlewareJWT.AuthorizeJWT,
                 MiddlewareJWT.AuthorizePermissionJWT('products:update')
             ],
+            hooks: {
+                after: async (req, res, params, entity) => {
+                    sendMessage('scenes_update_product', entity)
+                    sendMessage('shopping_cart_update_product', entity)
+                }
+            }
         },
         delete: { 
             middleware: [
                 MiddlewareJWT.AuthorizeJWT, 
                 MiddlewareJWT.AuthorizePermissionJWT('products:delete')
             ],
+            hooks: {
+                after: async (req, res, params, entity) => {
+                    sendMessage('scenes_delete_product', entity)
+                    sendMessage('shopping_cart_delete_product', entity)
+                }
+            }
         },
         upload: {
             fields: ['thumbnail_source'],
@@ -108,12 +120,24 @@ export default {
                 MiddlewareJWT.AuthorizeJWT,
                 MiddlewareJWT.AuthorizePermissionJWT('product-entities:update')
             ],
+            hooks: {
+                after: async (req, res, params, entity) => {
+                    sendMessage('scenes_update_product_entity', entity)
+                    sendMessage('shopping_cart_update_product_entity', entity)
+                }
+            }
         },
         delete: { 
             middleware: [
                 MiddlewareJWT.AuthorizeJWT, 
                 MiddlewareJWT.AuthorizePermissionJWT('product-entities:delete')
             ],
+            hooks: {
+                after: async (req, res, params, entity) => {
+                    sendMessage('scenes_delete_product_entity', entity)
+                    sendMessage('shopping_cart_delete_product_entity', entity)
+                }
+            }
         },
         debug
     }),
@@ -138,27 +162,41 @@ export default {
 
     ProductOrderController: RestController(`${prefix}product_orders`, 'uuid', ProductOrder, {
         find: {
-            middleware: [],
+            middleware: [
+                MiddlewareJWT.AuthorizeJWT, 
+                MiddlewareJWT.AuthorizePermissionJWT('product-orders:show')
+            ],
             includes: ['ProductOrderState', 'ProductOrderEntity'],
         },
         findAll: {
-            middleware: [],
+            middleware: [
+                MiddlewareJWT.AuthorizeJWT, 
+                MiddlewareJWT.AuthorizePermissionJWT('product-orders:index')
+            ],
             findProperties: ['uuid', 'cart_uuid', 'product_order_state_name'],
             whereProperties: ['uuid', 'cart_uuid', 'product_order_state_name'],
             includes: ['ProductOrderState', 'ProductOrderEntity'],
         },
         update: {
             properties: ['name', 'email', 'address', 'city', 'country', 'postal_code', 'deliver_option_name', 'payment_option_name', 'cart_uuid'],
-            middleware: [],
+            middleware: [
+                MiddlewareJWT.AuthorizeJWT, 
+                MiddlewareJWT.AuthorizePermissionJWT('product-orders:update')
+            ],
             hooks: {
                 after: async (req, res, params, entity) => {
+                    sendMessage('shopping_cart_update_product_order', entity)
                 }
             }
         },
         delete: {
-            middleware: [],
+            middleware: [
+                MiddlewareJWT.AuthorizeJWT, 
+                MiddlewareJWT.AuthorizePermissionJWT('product-orders:delete')
+            ],
             hooks: {
                 after: async (req, res, params, entity) => {
+                    sendMessage('shopping_cart_delete_product_order', entity)
                 }
             }
         },
@@ -167,11 +205,17 @@ export default {
 
     ProductOrderEntityController: RestController(`${prefix}product_order_entities`, 'uuid', ProductOrderEntity, {
         find: {
-            middleware: [],
+            middleware: [
+                MiddlewareJWT.AuthorizeJWT, 
+                MiddlewareJWT.AuthorizePermissionJWT('product-order-entities:show')
+            ],
             includes: ['ProductOrder', 'ProductEntity'],
         },
         findAll: {
-            middleware: [],
+            middleware: [
+                MiddlewareJWT.AuthorizeJWT, 
+                MiddlewareJWT.AuthorizePermissionJWT('product-order-entities:index')
+            ],
             findProperties: ['uuid'],
             whereProperties: ['uuid'],
             includes: ['ProductOrder', 'ProductEntity'],
@@ -181,11 +225,17 @@ export default {
 
     ProductOrderStateController: RestController(`${prefix}product_order_states`, 'name', ProductOrderState, {
         find: {
-            middleware: [],
+            middleware: [
+                MiddlewareJWT.AuthorizeJWT, 
+                MiddlewareJWT.AuthorizePermissionJWT('product-order-states:show')
+            ],
             includes: ['ProductOrder'],
         },
         findAll: {
-            middleware: [],
+            middleware: [
+                MiddlewareJWT.AuthorizeJWT, 
+                MiddlewareJWT.AuthorizePermissionJWT('product-order-states:index')
+            ],
             findProperties: ['name'],
             whereProperties: ['name'],
             includes: ['ProductOrder'],
@@ -195,11 +245,17 @@ export default {
 
     DeliverOptionController: RestController(`${prefix}deliver_options`, 'name', DeliverOption, {
         find: {
-            middleware: [],
+            middleware: [
+                MiddlewareJWT.AuthorizeJWT, 
+                MiddlewareJWT.AuthorizePermissionJWT('deliver-options:show')
+            ],
             includes: ['ProductOrder'],
         },
         findAll: {
-            middleware: [],
+            middleware: [
+                MiddlewareJWT.AuthorizeJWT, 
+                MiddlewareJWT.AuthorizePermissionJWT('deliver-options:index')
+            ],
             findProperties: ['name'],
             whereProperties: ['name'],
             includes: ['ProductOrder'],
@@ -209,11 +265,17 @@ export default {
 
     PaymentOptionController: RestController(`${prefix}payment_options`, 'name', PaymentOption, {
         find: {
-            middleware: [],
+            middleware: [
+                MiddlewareJWT.AuthorizeJWT, 
+                MiddlewareJWT.AuthorizePermissionJWT('payment-options:show')
+            ],
             includes: ['ProductOrder'],
         },
         findAll: {
-            middleware: [],
+            middleware: [
+                MiddlewareJWT.AuthorizeJWT, 
+                MiddlewareJWT.AuthorizePermissionJWT('payment-options:index')
+            ],
             findProperties: ['name'],
             whereProperties: ['name'],
             includes: ['ProductOrder'],
