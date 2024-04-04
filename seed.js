@@ -9,6 +9,7 @@ import ProductOrderState, { PRODUCT_ORDER_STATES } from './src/models/ProductOrd
 import ProductOrderEntity from './src/models/ProductOrderEntity.js';
 import DeliverOption, { DELIVER_OPTIONS } from './src/models/DeliverOption.js';
 import PaymentOption, { PAYMENT_OPTIONS } from './src/models/PaymentOption.js';
+import ValutaSetting, { VALUTA_SETTINGS } from './src/models/ValutaSetting.js';
 
 (async () => {
     await database.sync({ force: true });
@@ -27,5 +28,9 @@ import PaymentOption, { PAYMENT_OPTIONS } from './src/models/PaymentOption.js';
 
     Object.values(PAYMENT_OPTIONS).forEach(async option => {
         await PaymentOption.findOrCreate({ where: option });
+    });
+
+    Object.values(VALUTA_SETTINGS).forEach(async setting => {
+        await ValutaSetting.findOrCreate({ where: setting });
     });
 })();

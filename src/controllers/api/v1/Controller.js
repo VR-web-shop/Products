@@ -1,5 +1,6 @@
 import meteor from "@vr-web-shop/meteor";
 import MiddlewareJWT from "../../../jwt/MiddlewareJWT.js";
+import BrokerServiceProducer from "../../../services/BrokerServiceProducer.js";
 
 import Product from "../../../models/Product.js";
 import ProductEntity from "../../../models/ProductEntity.js";
@@ -9,6 +10,7 @@ import ProductOrderEntity from "../../../models/ProductOrderEntity.js";
 import ProductOrderState, { PRODUCT_ORDER_STATES } from "../../../models/ProductOrderState.js";
 import DeliverOption, { DELIVER_OPTIONS } from "../../../models/DeliverOption.js";
 import PaymentOption, { PAYMENT_OPTIONS } from "../../../models/PaymentOption.js";
+import ValutaSetting, { VALUTA_SETTINGS } from "../../../models/ValutaSetting.js";
 
 import StorageConfig from "../../../config/StorageConfig.js";
 import { sendMessage } from "../../../config/BrokerConfig.js";
@@ -45,8 +47,7 @@ export default {
             ],
             hooks: {
                 after: async (req, res, params, entity) => {
-                    sendMessage('scenes_new_product', entity);
-                    sendMessage('shopping_cart_new_product', entity);
+                    await BrokerServiceProducer.newProduct(entity);
                 }
             }
         },
@@ -58,8 +59,7 @@ export default {
             ],
             hooks: {
                 after: async (req, res, params, entity) => {
-                    sendMessage('scenes_update_product', entity)
-                    sendMessage('shopping_cart_update_product', entity)
+                    await BrokerServiceProducer.updateProduct(entity);
                 }
             }
         },
@@ -69,9 +69,9 @@ export default {
                 MiddlewareJWT.AuthorizePermissionJWT('products:delete')
             ],
             hooks: {
-                after: async (req, res, params, entity) => {
-                    sendMessage('scenes_delete_product', entity)
-                    sendMessage('shopping_cart_delete_product', entity)
+                after: async (req, res, params) => {
+                    await ProductEntity.destroy({ where: { product_uuid: params.uuid } });
+                    await BrokerServiceProducer.deleteProduct({uuid: params.uuid});
                 }
             }
         },
@@ -109,8 +109,7 @@ export default {
             ],
             hooks: {
                 after: async (req, res, params, entity) => {
-                    sendMessage('scenes_new_product_entity', entity)
-                    sendMessage('shopping_cart_new_product_entity', entity)
+                    await BrokerServiceProducer.newProductEntity(entity);
                 }
             }
         },
@@ -122,8 +121,7 @@ export default {
             ],
             hooks: {
                 after: async (req, res, params, entity) => {
-                    sendMessage('scenes_update_product_entity', entity)
-                    sendMessage('shopping_cart_update_product_entity', entity)
+                    await BrokerServiceProducer.updateProductEntity(entity);
                 }
             }
         },
@@ -133,9 +131,8 @@ export default {
                 MiddlewareJWT.AuthorizePermissionJWT('product-entities:delete')
             ],
             hooks: {
-                after: async (req, res, params, entity) => {
-                    sendMessage('scenes_delete_product_entity', entity)
-                    sendMessage('shopping_cart_delete_product_entity', entity)
+                after: async (req, res, params) => {
+                    await BrokerServiceProducer.deleteProductEntity({uuid: params.uuid});
                 }
             }
         },
@@ -196,8 +193,7 @@ export default {
                         const productEntities = await ProductEntity.findAll({ where: { uuid: productOrderEntities.map(poe => poe.product_entity_uuid) } })
                         for (const productEntity of productEntities) {
                             await productEntity.update({ product_entity_state_name: PRODUCT_ENTITY_STATES.AVAILABLE_FOR_PURCHASE })
-                            sendMessage('scenes_update_product_entity', productEntity)
-                            sendMessage('shopping_cart_update_product_entity', productEntity)
+                            await BrokerServiceProducer.updateProductEntity(productEntity)
                         }
                     }
 
@@ -206,8 +202,7 @@ export default {
                         const productEntities = await ProductEntity.findAll({ where: { uuid: productOrderEntities.map(poe => poe.product_entity_uuid) } })
                         for (const productEntity of productEntities) {
                             await productEntity.update({ product_entity_state_name: PRODUCT_ENTITY_STATES.SHIPPED_TO_CUSTOMER })
-                            sendMessage('scenes_update_product_entity', productEntity)
-                            sendMessage('shopping_cart_update_product_entity', productEntity)
+                            await BrokerServiceProducer.updateProductEntity(productEntity)
                         }
                     }
 
@@ -216,12 +211,11 @@ export default {
                         const productEntities = await ProductEntity.findAll({ where: { uuid: productOrderEntities.map(poe => poe.product_entity_uuid) } })
                         for (const productEntity of productEntities) {
                             await productEntity.update({ product_entity_state_name: PRODUCT_ENTITY_STATES.DELIVERED_TO_CUSTOMER })
-                            sendMessage('scenes_update_product_entity', productEntity)
-                            sendMessage('shopping_cart_update_product_entity', productEntity)
+                            await BrokerServiceProducer.updateProductEntity(productEntity)
                         }
                     }
 
-                    sendMessage('shopping_cart_update_product_order', entity)
+                    await BrokerServiceProducer.updateProductOrder(entity)
                 }
             }
         },
@@ -318,4 +312,24 @@ export default {
         },
         debug
     }),
+
+    ValutaSettingController: RestController(`${prefix}valuta_settings`, 'name', ValutaSetting, {
+        find: {
+            middleware: [],
+        },
+        findAll: {
+            middleware: [],
+            findProperties: ['name'],
+            whereProperties: ['name', 'active'],
+        },
+        update: {
+            properties: ['active'],
+            middleware: [
+                MiddlewareJWT.AuthorizeJWT, 
+                MiddlewareJWT.AuthorizePermissionJWT('valuta-settings:update')
+            ],
+        },
+        debug
+    }),
+
 }
