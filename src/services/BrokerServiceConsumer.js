@@ -33,7 +33,7 @@ async function onUpdateProductEntity(msg) {
  */
 async function onNewProductOrder(msg) {
     const { productOrder, productOrderEntities } = msg;
-
+    
     await ProductOrder.create(productOrder);
     for (const entity of productOrderEntities) {
         await ProductOrderEntity.create(entity);

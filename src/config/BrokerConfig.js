@@ -35,6 +35,6 @@ export const connect = async () => {
     ch = await conn.createChannel();
 
     for (const conf of BrokerServiceConsumer.config) {
-        addListener(conf.type, conf.handler);
+        addListener(conf.type, conf.callback);
     }
 }

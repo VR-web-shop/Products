@@ -7,7 +7,6 @@ const ProductOrderEntity = Database.define("ProductOrderEntity", {
         primaryKey: true
     },
 }, {
-    paranoid: true,
     underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
