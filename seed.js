@@ -11,6 +11,8 @@ import DeliverOption, { DELIVER_OPTIONS } from './src/models/DeliverOption.js';
 import PaymentOption, { PAYMENT_OPTIONS } from './src/models/PaymentOption.js';
 import ValutaSetting, { VALUTA_SETTINGS } from './src/models/ValutaSetting.js';
 
+import demoProducts from './demo_products.json' assert { type: "json" };
+
 (async () => {
     await database.sync({ force: true });
 
@@ -32,5 +34,12 @@ import ValutaSetting, { VALUTA_SETTINGS } from './src/models/ValutaSetting.js';
 
     Object.values(VALUTA_SETTINGS).forEach(async setting => {
         await ValutaSetting.findOrCreate({ where: setting });
+    });
+
+    const CDNUrl = process.env.S3_CDN_URL
+    const { products } = demoProducts;
+    products.forEach(async product => {
+        product.thumbnail_source = CDNUrl + "/" + product.thumbnail_source;
+        await Product.create(product);
     });
 })();
