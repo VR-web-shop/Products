@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import Database from './Database.js';
+import Database from '../../db/models/index.cjs';
 
 export const DELIVER_OPTIONS = {
     STANDARD_DELIVERY: { name: 'Standard Delivery', price: 10 },

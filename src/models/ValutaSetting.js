@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import Database from './Database.js';
+import Database from '../config/DatabaseConfig.js';
 
 export const VALUTA_SETTINGS = {
     EURO: { name: 'Euro', short: 'EUR', symbol: '€', active: false },

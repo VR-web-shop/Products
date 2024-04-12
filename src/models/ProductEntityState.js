@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import Database from './Database.js';
+import Database from '../config/DatabaseConfig.js';
 
 export const PRODUCT_ENTITY_STATES = {
     AVAILABLE_FOR_PURCHASE: 'AVAILABLE_FOR_PURCHASE',

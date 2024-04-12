@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import Database from './Database.js';
+import Database from '../config/DatabaseConfig.js';
 
 export const PAYMENT_OPTIONS = {
     CREDIT_CARD: { name: 'Credit Card', price: 0 },

@@ -38,3 +38,10 @@ export const connect = async () => {
         addListener(conf.type, conf.callback);
     }
 }
+
+export default {
+    connect,
+    addListener,
+    removeListener,
+    sendMessage,
+}

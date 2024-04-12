@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import Database from './Database.js';
+import Database from '../config/DatabaseConfig.js';
 import ProductEntityState from './ProductEntityState.js';
 
 const ProductEntity = Database.define("ProductEntity", {
