@@ -15,14 +15,30 @@ const findAll = async (limit=10, offset=0) => {
     return await Model.findAll({ limit, offset });
 }
 
+const create = async (name, price) => {
+    const deliverOption = await Model.findOne({ where: { name } });
+    if (deliverOption) {
+        throw new Error('Deliver option with ' + name + ' already exists');
+    }
+
+    return await Model.create({ name, price });
+}
+
 const update = async (name, price) => {
     const deliverOption = await find(name);
     await deliverOption.update({ price })
     return deliverOption;
 }
 
+const remove = async (name) => {
+    const deliverOption = await find(name);
+    await deliverOption.destroy();
+}
+
 export default {
     find,
     findAll,
-    update
+    create,
+    update,
+    remove
 };

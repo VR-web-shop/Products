@@ -27,17 +27,28 @@ beforeAll(async () => {
   return tester;
 });
 
-test('DeliverOption queries fetches all deliver options', async () => { 
+test('deliverOptions queries fetches all deliver options', async () => { 
   const { data } = await tester.graphql('{ deliverOptions { name } }');
   expect(data.deliverOptions.length).toBe(3);
 });
 
-test('DeliverOption queries fetches a specific deliver option by name', async () => {
+test('deliverOption queries fetches a specific deliver option by name', async () => {
   const { data } = await tester.graphql('{ deliverOption(name: "Pickup") { name } }');
   expect(data.deliverOption.name).toBe('Pickup');
 });
 
-test('DeliverOption mutation updates a deliver option', async () => {
+test('createDeliverOption mutation creates a deliver option', async () => {
+  const { data } = await tester.graphql(`mutation {
+    createDeliverOption(input: { name: "Home Delivery", price: 15 }) {
+      name
+      price
+    }
+  }`);
+  expect(data.createDeliverOption.name).toBe('Home Delivery');
+  expect(data.createDeliverOption.price).toBe(15);
+});
+
+test('updateDeliverOption mutation updates a deliver option', async () => {
   const { data } = await tester.graphql(`mutation {
     updateDeliverOption(input: { name: "Pickup", price: 5 }) {
       name
@@ -46,3 +57,11 @@ test('DeliverOption mutation updates a deliver option', async () => {
   }`);
   expect(data.updateDeliverOption.price).toBe(5);
 });
+
+test('deleteDeliverOption mutation deletes a deliver option', async () => {
+  const { data } = await tester.graphql(`mutation {
+    deleteDeliverOption(name: "Express Delivery")
+  }`);
+  expect(data.deleteDeliverOption).toBe(true);
+});
+

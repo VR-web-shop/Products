@@ -2,6 +2,10 @@ import ProductEntity from '../models/ProductEntity.js';
 import ProductOrder from '../models/ProductOrder.js';
 import ProductOrderEntity from '../models/ProductOrderEntity.js';
 
+import ProductEntityService from '../services/ProductEntityService.js';
+import ProductOrderService from '../services/ProductOrderService.js';
+import ProductOrderEntityService from '../services/ProductOrderEntityService.js';
+
 const TYPES = {
     PRODUCTS_UPDATE_PRODUCT_ENTITY: 'products_update_product_entity',
     PRODUCTS_NEW_PRODUCT_ORDER: 'products_new_product_order',
