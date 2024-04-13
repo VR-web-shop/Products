@@ -15,8 +15,21 @@ const findAll = async (limit=10, offset=0) => {
     return await Model.findAll({ limit, offset });
 }
 
-const create = async (product_order_uuid, product_entity_uuid) => {
-    return await Model.create({ product_order_uuid, product_entity_uuid });
+const findAllWhere = async (where) => {
+    return await Model.findAll({ where });
+}
+
+const create = async (product_order_uuid, product_entity_uuid, uuid=null) => {
+    const params = {
+        product_order_uuid, 
+        product_entity_uuid
+    };
+
+    if (uuid) {
+        params.uuid = uuid;
+    }
+
+    return await Model.create(params);
 }
 
 const update = async (uuid, product_order_uuid, product_entity_uuid) => {
@@ -33,6 +46,7 @@ const remove = async (uuid) => {
 export default {
     find,
     findAll,
+    findAllWhere,
     create,
     update,
     remove

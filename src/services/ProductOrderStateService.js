@@ -15,6 +15,10 @@ const findAll = async (limit=10, offset=0) => {
     return await Model.findAll({ limit, offset });
 }
 
+const findAllWhere = async (where) => {
+    return await Model.findAll({ where });
+}
+
 const create = async (name) => {
     const productOrderState = await Model.findOne({ where: { name } });
     if (productOrderState) {
@@ -32,6 +36,7 @@ const remove = async (name) => {
 export default {
     find,
     findAll,
+    findAllWhere,
     create,
     //update, Not needed for this service
     remove

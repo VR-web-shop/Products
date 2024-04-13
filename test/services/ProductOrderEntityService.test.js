@@ -136,6 +136,12 @@ test('findAll fetches all product order entities', async () => {
   expect(rows.length).toBe(3);
 });
 
+test('findAllWhere fetches all product order entities with a specific name', async () => {
+    const where = { product_order_uuid: 'aaa-aaa-aaa-aaa' };
+    const rows = await ProductOrderEntityService.findAllWhere(where);
+    expect(rows.length).toBe(3);
+});
+
 test('find fetches a specific product order entity by uuid', async () => {
   const entity = await ProductOrderEntityService.find('aaa-aaa-aaa-aaa');
   expect(entity.uuid).toBe('aaa-aaa-aaa-aaa');

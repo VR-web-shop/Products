@@ -15,6 +15,10 @@ const findAll = async (limit=10, offset=0) => {
     return await Model.findAll({ limit, offset });
 }
 
+const findAllWhere = async (where) => {
+    return await Model.findAll({ where });
+}
+
 const create = async (name, description, thumbnail_source, price) => {
     return await Model.create({ name, description, thumbnail_source, price });
 }
@@ -33,6 +37,7 @@ const remove = async (uuid) => {
 export default {
     find,
     findAll,
+    findAllWhere,
     create,
     update,
     remove

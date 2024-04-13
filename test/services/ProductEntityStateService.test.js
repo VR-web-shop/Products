@@ -24,6 +24,12 @@ test('findAll fetches all product entity states', async () => {
   expect(rows.length).toBe(2);
 });
 
+test('findAllWhere fetches all product entity states with a specific name', async () => {
+    const where = { name: 'Available' };
+    const rows = await ProductEntityStateService.findAllWhere(where);
+    expect(rows.length).toBe(1);
+});
+
 test('find fetches a specific product entity state by name', async () => {
   const entity = await ProductEntityStateService.find('Available');
   expect(entity.name).toBe('Available');

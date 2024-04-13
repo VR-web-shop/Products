@@ -15,6 +15,10 @@ const findAll = async (limit=10, offset=0) => {
     return await Model.findAll({ limit, offset });
 }
 
+const findAllWhere = async (where) => {
+    return await Model.findAll({ where });
+}
+
 const create = async (
     name, 
     email, 
@@ -24,9 +28,11 @@ const create = async (
     postal_code, 
     deliver_option_name,
     payment_option_name,
-    product_order_state_name
+    product_order_state_name,
+    uuid=null
 ) => {
-    return await Model.create({ 
+
+    const params = {
         name, 
         email, 
         address, 
@@ -36,7 +42,13 @@ const create = async (
         deliver_option_name,
         payment_option_name,
         product_order_state_name
-    });
+    };
+
+    if (uuid) {
+        params.uuid = uuid;
+    }
+    
+    return await Model.create(params);
 }
 
 const update = async (
@@ -75,6 +87,7 @@ const remove = async (uuid) => {
 export default {
     find,
     findAll,
+    findAllWhere,
     create,
     update,
     remove

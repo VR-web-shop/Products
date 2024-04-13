@@ -36,6 +36,12 @@ test('find fetches a specific deliver option by name', async () => {
   expect(entity.price).toBe(10);
 });
 
+test('findAllWhere fetches all deliver option with a specific name', async () => {
+    const where = { name: 'Standard Delivery' };
+    const rows = await DeliverOptionService.findAllWhere(where);
+    expect(rows.length).toBe(1);
+});
+
 test('create, creates a deliver option', async () => {
   const entity = await DeliverOptionService.create('Home Delivery', 5);
   expect(entity.name).toBe('Home Delivery');

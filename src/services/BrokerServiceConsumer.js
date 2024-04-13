@@ -1,7 +1,3 @@
-import ProductEntity from '../models/ProductEntity.js';
-import ProductOrder from '../models/ProductOrder.js';
-import ProductOrderEntity from '../models/ProductOrderEntity.js';
-
 import ProductEntityService from '../services/ProductEntityService.js';
 import ProductOrderService from '../services/ProductOrderService.js';
 import ProductOrderEntityService from '../services/ProductOrderEntityService.js';
@@ -24,11 +20,11 @@ const config = [
  * @returns {Promise<void>}
  */
 async function onUpdateProductEntity(msg) {
-    const uuid = msg.uuid;
-    const entity = await ProductEntity.findOne({ where: { uuid } });
-    await entity.update({
-        product_entity_state_name: msg.product_entity_state_name
-    });
+    await ProductEntityService.update(
+        msg.uuid,
+        msg.product_entity_state_name,
+        msg.product_uuid
+    );
 }
 /**
  * @function onNewProductOrder
@@ -38,9 +34,25 @@ async function onUpdateProductEntity(msg) {
 async function onNewProductOrder(msg) {
     const { productOrder, productOrderEntities } = msg;
     
-    await ProductOrder.create(productOrder);
+    await ProductOrderService.create(
+        productOrder.name,
+        productOrder.email,
+        productOrder.address,
+        productOrder.city,
+        productOrder.country,
+        productOrder.postal_code,
+        productOrder.deliver_option_name,
+        productOrder.payment_option_name,
+        productOrder.product_order_state_name,
+        productOrder.uuid
+    );
+
     for (const entity of productOrderEntities) {
-        await ProductOrderEntity.create(entity);
+        await ProductOrderEntityService.create(
+            entity.product_order_uuid,
+            entity.product_entity_uuid,
+            entity.uuid
+        );
     }
 }
 
@@ -52,17 +64,42 @@ async function onNewProductOrder(msg) {
 async function onUpdateProductOrder(msg) {
     const { productOrder, productOrderEntities } = msg;
     productOrder.ProductOrderStateName = productOrder.product_order_state_name;
+    
     // Delete all product order entities
-    await ProductOrderEntity.destroy({ where: { product_order_uuid: productOrder.uuid } });
+    const productOrderEntityRecords = await ProductOrderEntityService.findAllWhere({
+        product_order_uuid: productOrder.uuid
+    });
+    for (const entity of productOrderEntityRecords) {
+        await ProductOrderEntityService.remove(entity.uuid);
+    }
+    
     // Update the product order
-    await ProductOrder.update(productOrder, { where: { uuid: productOrder.uuid } });
+    await ProductOrderService.update(
+        productOrder.uuid,
+        productOrder.name,
+        productOrder.email,
+        productOrder.address,
+        productOrder.city,
+        productOrder.country,
+        productOrder.postal_code,
+        productOrder.deliver_option_name,
+        productOrder.payment_option_name,
+        productOrder.product_order_state_name
+    );
+    
     // Create new product order entities
     for (const entity of productOrderEntities) {
-        await ProductOrderEntity.create(entity);
+        await ProductOrderEntityService.create(
+            entity.product_order_uuid,
+            entity.product_entity_uuid,
+            entity.uuid
+        );
     }
 }
 
-
 export default {
-    config
+    config,
+    onUpdateProductEntity,
+    onNewProductOrder,
+    onUpdateProductOrder
 }

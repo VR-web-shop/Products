@@ -36,6 +36,12 @@ test('findAll fetches all valuta settings', async () => {
   expect(rows.length).toBe(3);
 });
 
+test('findAllWhere fetches all product order states with a specific name', async () => {
+    const where = { name: 'USD' };
+    const rows = await ValutaSettingService.findAllWhere(where);
+    expect(rows.length).toBe(1);
+});
+
 test('find fetches a specific valuta setting by name', async () => {
   const entity = await ValutaSettingService.find('USD');
   expect(entity.name).toBe('USD');

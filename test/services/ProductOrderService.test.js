@@ -95,6 +95,12 @@ test('findAll fetches all product orders', async () => {
   expect(rows.length).toBe(3);
 });
 
+test('findAllWhere fetches all product orders with a specific name', async () => {
+    const where = { name: 'John Doe' };
+    const rows = await ProductOrderService.findAllWhere(where);
+    expect(rows.length).toBe(2);
+});
+
 test('find fetches a specific product order by uuid', async () => {
   const entity = await ProductOrderService.find('aaa-aaa-aaa-aaa');
   expect(entity.uuid).toBe('aaa-aaa-aaa-aaa');

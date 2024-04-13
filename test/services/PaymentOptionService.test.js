@@ -30,6 +30,12 @@ test('findAll fetches all payment options', async () => {
   expect(rows.length).toBe(3);
 });
 
+test('findAllWhere fetches all payment options with a specific name', async () => {
+    const where = { name: 'Credit Card' };
+    const rows = await PaymentOptionService.findAllWhere(where);
+    expect(rows.length).toBe(1);
+});
+
 test('find fetches a specific payment option by name', async () => {
   const entity = await PaymentOptionService.find('Credit Card');
   expect(entity.name).toBe('Credit Card');

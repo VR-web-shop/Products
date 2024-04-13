@@ -24,6 +24,12 @@ test('findAll fetches all product order states', async () => {
   expect(rows.length).toBe(2);
 });
 
+test('findAllWhere fetches all product order states with a specific name', async () => {
+    const where = { name: 'Pending' };
+    const rows = await ProductOrderStateService.findAllWhere(where);
+    expect(rows.length).toBe(1);
+});
+
 test('find fetches a specific product order state by name', async () => {
   const entity = await ProductOrderStateService.find('Pending');
   expect(entity.name).toBe('Pending');
