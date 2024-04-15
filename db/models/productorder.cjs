@@ -17,13 +17,29 @@ module.exports = (sequelize, DataTypes) => {
       ProductOrder.belongsToMany(models.ProductEntity, { through: models.ProductOrderEntity });
       ProductOrder.hasMany(models.ProductOrderEntity);
       */
-      models.ProductOrder.hasMany(models.ProductEntityDescription, {
+      models.ProductOrder.hasMany(models.ProductOrderDescription, {
         foreignKey: 'product_order_client_side_uuid',
         sourceKey: 'client_side_uuid',
       });
-      models.ProductOrder.hasMany(models.ProductEntityRemoved, {
+      models.ProductOrder.hasMany(models.ProductOrderRemoved, {
         foreignKey: 'product_order_client_side_uuid',
         sourceKey: 'client_side_uuid',
+      });
+
+      models.ProductOrder.belongsToMany(models.DeliverOptionDescription, {
+        through: models.ProductOrderDescription,
+        foreignKey: 'deliver_option_client_side_uuid',
+        otherKey: 'product_order_client_side_uuid'
+      });
+      models.ProductOrder.belongsToMany(models.PaymentOptionDescription, {
+        through: models.ProductOrderDescription,
+        foreignKey: 'payment_option_client_side_uuid',
+        otherKey: 'product_order_client_side_uuid'
+      });
+      models.ProductOrder.belongsToMany(models.ProductOrderState, {
+        through: models.ProductOrderDescription,
+        foreignKey: 'product_order_state_name',
+        otherKey: 'product_order_client_side_uuid'
       });
     }
   }

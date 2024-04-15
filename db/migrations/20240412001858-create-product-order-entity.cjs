@@ -3,11 +3,10 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('ProductOrderEntities', {
-      uuid: {
-        allowNull: false,
-        primaryKey: true,
-        type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4
+      clientSideUUID: {
+        type: Sequelize.STRING,
+        field: 'client_side_uuid',
+        primaryKey: true
       },
       createdAt: {
         allowNull: false,
@@ -18,33 +17,9 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        field: 'created_at',
+        field: 'updated_at',
         defaultValue: Sequelize.fn('now')
       },
-      deletedAt: {
-        type: Sequelize.DATE,
-        field: 'deleted_at'
-      },
-      product_order_uuid: {
-        allowNull: false,
-        type: Sequelize.UUID,
-        references: {
-          model: 'ProductOrders',
-          key: 'uuid'
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
-      },
-      product_entity_uuid: {
-        allowNull: false,
-        type: Sequelize.UUID,
-        references: {
-          model: 'ProductEntities',
-          key: 'uuid'
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
-      }
     });
   },
   async down(queryInterface, Sequelize) {

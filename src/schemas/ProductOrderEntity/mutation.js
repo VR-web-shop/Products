@@ -1,52 +1,43 @@
-import ProductOrderEntityService from "../../services/ProductOrderEntityService.js";
+import RequestError from "../RequestError/RequestError.js";
+import ModelQueryService from "../../services/ModelQueryService.js";
+import ModelCommandService from "../../services/ModelCommandService.js";
+import ReadOneQuery from "../../queries/ProductOrderEntity/ReadOneQuery.js";
+import PutCommand from "../../commands/ProductOrderEntity/PutCommand.js";
+import DeleteCommand from "../../commands/ProductOrderEntity/DeleteCommand.js";
+import Restricted from "../../jwt/Restricted.js";
 
-const typeDef = `
-  type Mutation {
-    createProductOrderEntity(input: ProductOrderEntityInput!): ProductOrderEntity
-    updateProductOrderEntity(input: ProductOrderEntityInput!): ProductOrderEntity
-    deleteProductOrderEntity(uuid: String!): Boolean
-  }
-
-  input ProductOrderEntityInput {
-    uuid: String
-    product_order_uuid: String! 
-    product_entity_uuid: String!
-  }
-`;
+const commandService = ModelCommandService();
+const queryService = ModelQueryService();
 
 const resolvers = {
   Mutation: {
-    createProductOrderEntity: async (_, { input }) => {
-      try {
-        const { product_order_uuid, product_entity_uuid } = input;
-        return await ProductOrderEntityService.create(product_order_uuid, product_entity_uuid);
-      } catch (error) {
-        console.log('error', error);
-        throw new Error('Failed to create product order entity');
-      }
-    },
-    updateProductOrderEntity: async (_, { input  }) => {
-      try {
-        const { uuid, product_order_uuid, product_entity_uuid } = input;
-        return await ProductOrderEntityService.update(uuid, product_order_uuid, product_entity_uuid);
-      } catch (error) {
-        console.log('error', error);
-        throw new Error('Failed to update product order entity');
-      }
-    },
-    deleteProductOrderEntity: async (_, { uuid }) => {
-      try {
-        await ProductOrderEntityService.remove(uuid);
-        return true;
-      } catch (error) {
-        console.log('error', error);
-        throw new Error('Failed to delete product order entity');
-      }
-    }
+    putProductOrderEntity: async (_, { input }, context) => {
+		try {
+			return await Restricted({ context, permission: 'product-order-entities:put' }, async () => {
+				const { clientSideUUID, product_order_uuid, product_entity_uuid } = input;
+				await commandService.invoke(new PutCommand(clientSideUUID, { product_order_uuid, product_entity_uuid }));
+				const entity = await queryService.invoke(new ReadOneQuery(clientSideUUID));
+				return { __typename: 'ProductOrderEntity', ...entity };
+			})
+		} catch (error) {
+			console.log('error', error);
+			if (error instanceof RequestError) return error.toResponse();
+			else throw new Error('Failed to put product order entity');
+		}
+	},
+	deleteProductOrderEntity: async (_, { clientSideUUID }) => {
+		try {
+			return await Restricted({ context, permission: 'product-order-entities:delete' }, async () => {
+				await commandService.invoke(new DeleteCommand(clientSideUUID));
+				return { __typename: 'BooleanResult', result: true };
+			})
+		} catch (error) {
+			console.log('error', error);
+			if (error instanceof RequestError) return error.toResponse();
+			else throw new Error('Failed to delete product order entity');
+		}
+	}
   }
 };
 
-export default {
-    typeDef,
-    resolvers
-};
+export default resolvers;

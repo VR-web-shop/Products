@@ -10,7 +10,12 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      ProductEntityState.hasMany(models.ProductEntityDescription);
+      models.ProductEntityState.hasMany(models.ProductEntityDescription);
+      models.ProductEntityState.belongsToMany(models.ProductEntity, {
+        through: models.ProductEntityDescription,
+        foreignKey: 'product_entity_state_name',
+        otherKey: 'product_entity_client_side_uuid'
+      });
     }
   }
   ProductEntityState.init({

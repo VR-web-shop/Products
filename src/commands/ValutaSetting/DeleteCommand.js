@@ -5,9 +5,9 @@ export default class DeleteCommand extends _DeleteCommand {
         super(
             clientSideUUID, 
             "client_side_uuid",
-            "payment_option_client_side_uuid",
-            "PaymentOption",
-            "PaymentOptionRemoved"
+            "valuta_setting_client_side_uuid",
+            "ValutaSetting",
+            "ValutaSettingRemoved"
         );
     }
 }

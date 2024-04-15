@@ -3,11 +3,10 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('ProductEntities', {
-      uuid: {
-        type: Sequelize.UUID,
-        primaryKey: true,
-        allowNull: false,
-        defaultValue: Sequelize.UUIDV4
+      clientSideUUID: {
+        type: Sequelize.STRING,
+        field: 'client_side_uuid',
+        primaryKey: true
       },
       createdAt: {
         allowNull: false,
@@ -21,26 +20,6 @@ module.exports = {
         field: 'updated_at',
         defaultValue: Sequelize.fn('now')
       },
-      deletedAt: {
-        type: Sequelize.DATE,
-        field: 'deleted_at'
-      },
-      product_entity_state_name: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        references: {
-          model: 'ProductEntityStates',
-          key: 'name'
-        }
-      },
-      product_uuid: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: 'Products',
-          key: 'uuid'
-        }
-      }
     });
   },
   async down(queryInterface, Sequelize) {

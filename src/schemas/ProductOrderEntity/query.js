@@ -1,40 +1,38 @@
-import ProductOrderEntityService from "../../services/ProductOrderEntityService.js";
+import RequestError from "../RequestError/RequestError.js";
+import ModelQueryService from "../../services/ModelQueryService.js";
+import ReadOneQuery from "../../queries/ProductOrderEntity/ReadOneQuery.js";
+import ReadCollectionQuery from "../../queries/ProductOrderEntity/ReadCollectionQuery.js";
+import Restricted from "../../jwt/Restricted.js";
 
-const typeDef = `
-  type ProductOrderEntity {
-    uuid: String
-    product_order_uuid: String! 
-    product_entity_uuid: String!
-  }
-
-  type Query {
-    productOrderEntities(limit: Float, offset: Float): [ProductOrderEntity]
-    productOrderEntity(uuid: String!): ProductOrderEntity
-  }
-`;
+const service = ModelQueryService();
 
 const resolvers = {
   Query: {
-    productOrderEntities: async (_, {limit=10, offset=0}) => {
+    productOrderEntities: async (_, { limit, page }, context) => {
         try {
-          return await ProductOrderEntityService.findAll(limit, offset);
+            return await Restricted({ context, permission: 'product-order-entities:index' }, async () => {
+                const { rows, pages, count } = await service.invoke(new ReadCollectionQuery({ limit, page }));
+                return { __typename: 'ProductOrderEntities', rows, pages, count };
+            })
         } catch (error) {
-          console.log('error', error);
-          throw new Error('Failed to get product order entities');
+            console.log('error', error);
+            if (error instanceof RequestError) return error.toResponse();
+            else throw new Error('Failed to get product order entities');
         }
     },
-    productOrderEntity: async (_, { uuid }) => {
-      try {
-        return await ProductOrderEntityService.find(uuid);
-      } catch (error) {
-        console.log('error', error);
-        throw new Error('Failed to get product order entity');
-      }
+    productOrderEntity: async (_, { clientSideUUID }, context) => {
+        try {
+            return await Restricted({ context, permission: 'product-order-entities:show' }, async () => {
+                const entity = await service.invoke(new ReadOneQuery(clientSideUUID));
+                return { __typename: 'ProductOrderEntity', ...entity };
+            })
+        } catch (error) {
+            console.log('error', error);
+            if (error instanceof RequestError) return error.toResponse();
+            else throw new Error('Failed to get product order entity');
+        }
     }
   }
 };
 
-export default {
-    typeDef,
-    resolvers
-};
+export default resolvers;

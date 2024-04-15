@@ -1,53 +1,43 @@
-import ValutaSettingService from "../../services/ValutaSettingService.js";
+import RequestError from "../RequestError/RequestError.js";
+import ModelQueryService from "../../services/ModelQueryService.js";
+import ModelCommandService from "../../services/ModelCommandService.js";
+import ReadOneQuery from "../../queries/ValutaSetting/ReadOneQuery.js";
+import PutCommand from "../../commands/ValutaSetting/PutCommand.js";
+import DeleteCommand from "../../commands/ValutaSetting/DeleteCommand.js";
+import Restricted from "../../jwt/Restricted.js";
 
-const typeDef = `
-  type Mutation {
-    createValutaSetting(input: ValutaSettingInput!): ValutaSetting
-    updateValutaSetting(input: ValutaSettingInput!): ValutaSetting
-    deleteValutaSetting(name: String!): Boolean
-  }
-
-  input ValutaSettingInput {
-    name: String!
-    short: String!
-    symbol: String!
-    active: Boolean
-  }
-`;
+const commandService = ModelCommandService();
+const queryService = ModelQueryService();
 
 const resolvers = {
   Mutation: {
-    createValutaSetting: async (_, { input }) => {
-      try {
-        const { name, short, symbol, active } = input;
-        return await ValutaSettingService.create(name, short, symbol, active);
-      } catch (error) {
-        console.log('error', error);
-        throw new Error('Failed to create valuta setting');
-      }
-    },
-    updateValutaSetting: async (_, { input  }) => {
-      try {
-        const { name, short, symbol, active } = input;
-        return await ValutaSettingService.update(name, short, symbol, active);
-      } catch (error) {
-        console.log('error', error);
-        throw new Error('Failed to update valuta setting');
-      }
-    },
-    deleteValutaSetting: async (_, { name }) => {
-      try {
-        await ValutaSettingService.remove(name);
-        return true;
-      } catch (error) {
-        console.log('error', error);
-        throw new Error('Failed to delete valuta setting');
-      }
-    }
+    putValutaSetting: async (_, { input }, context) => {
+		try {
+			return await Restricted({ context, permission: 'valuta-settings:put' }, async () => {
+				const { clientSideUUID, name, short, symbol, active } = input;
+				await commandService.invoke(new PutCommand(clientSideUUID, { name, short, symbol, active }));
+				const entity = await queryService.invoke(new ReadOneQuery(clientSideUUID));
+				return { __typename: 'ValutaSetting', ...entity };
+			})
+		} catch (error) {
+			console.log('error', error);
+			if (error instanceof RequestError) return error.toResponse();
+			else throw new Error('Failed to put valuta setting');
+		}
+	},
+	deleteValutaSetting: async (_, { clientSideUUID }) => {
+		try {
+			return await Restricted({ context, permission: 'valuta-settings:delete' }, async () => {
+				await commandService.invoke(new DeleteCommand(clientSideUUID));
+				return { __typename: 'BooleanResult', result: true };
+			})
+		} catch (error) {
+			console.log('error', error);
+			if (error instanceof RequestError) return error.toResponse();
+			else throw new Error('Failed to delete product order entity');
+		}
+	}
   }
 };
 
-export default {
-    typeDef,
-    resolvers
-};
+export default resolvers;

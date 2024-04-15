@@ -10,17 +10,33 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      models.ProductOrderEntityDescription.belongsTo(models.ProductOrder, { 
+      models.ProductOrderEntityDescription.belongsTo(models.ProductOrderDescription, { 
         foreignKey: 'product_order_client_side_uuid', 
         targetKey: 'client_side_uuid'
       });
-      models.ProductOrderEntityDescription.belongsTo(models.ProductEntity, { 
+      models.ProductOrderEntityDescription.belongsTo(models.ProductEntityDescription, { 
         foreignKey: 'product_entity_client_side_uuid', 
         targetKey: 'client_side_uuid'
       });
-      models.ProductOrderEntityDescription.belongsTo(models.ProductOrderEntity, { 
+      models.ProductOrderEntityDescription.belongsTo(models.ProductOrderEntityDescription, { 
         foreignKey: 'product_order_entity_client_side_uuid', 
         targetKey: 'client_side_uuid'
+      });
+
+      models.ProductOrderEntityDescription.belongsToMany(models.ProductOrder, {
+        through: models.ProductOrderDescription,
+        foreignKey: 'product_order_client_side_uuid',
+        otherKey: 'client_side_uuid'
+      });
+      models.ProductOrderEntityDescription.belongsToMany(models.ProductEntity, {
+        through: models.ProductEntityDescription,
+        foreignKey: 'product_entity_client_side_uuid',
+        otherKey: 'client_side_uuid'
+      });
+      models.ProductOrderEntityDescription.belongsToMany(models.ProductOrderEntity, {
+        through: models.ProductOrderEntityDescription,
+        foreignKey: 'product_order_entity_client_side_uuid',
+        otherKey: 'client_side_uuid'
       });
     }
   }

@@ -23,6 +23,16 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'product_entity_client_side_uuid',
         sourceKey: 'client_side_uuid',
       });
+      models.ProductEntity.belongsToMany(models.ProductDescription, {
+        through: models.ProductEntityDescription,
+        foreignKey: 'product_client_side_uuid',
+        otherKey: 'client_side_uuid'
+      });
+      models.ProductEntity.belongsToMany(models.ProductEntityState, {
+        through: models.ProductEntityDescription,
+        foreignKey: 'product_entity_state_name',
+        otherKey: 'product_entity_client_side_uuid'
+      });
     }
   }
   ProductEntity.init({

@@ -1,40 +1,30 @@
-import ProductEntityStateService from "../../services/ProductEntityStateService.js";
+import RequestError from "../RequestError/RequestError.js";
+import ModelQueryService from "../../services/ModelQueryService.js";
+import ModelCommandService from "../../services/ModelCommandService.js";
+import ReadOneQuery from "../../queries/ProductEntityState/ReadOneQuery.js";
+import CreateCommand from "../../commands/ProductEntityState/CreateCommand.js";
+import Restricted from "../../jwt/Restricted.js";
 
-const typeDef = `
-  type Mutation {
-    createProductEntityState(input: ProductEntityStateInput!): ProductEntityState
-    deleteProductEntityState(name: String!): Boolean
-  }
-
-  input ProductEntityStateInput {
-    name: String!
-  }
-`;
+const commandService = ModelCommandService();
+const queryService = ModelQueryService();
 
 const resolvers = {
   Mutation: {
     createProductEntityState: async (_, { input }) => {
       try {
-        const { name } = input;
-        return await ProductEntityStateService.create(name);
+        return await Restricted({ context, permission: 'product-entity-states:put' }, async () => {
+          const { name } = input;
+          await commandService.invoke(new CreateCommand(name));
+          const entity = await queryService.invoke(new ReadOneQuery(name));
+          return { __typename: 'ProductEntityState', ...entity };
+        })
       } catch (error) {
         console.log('error', error);
-        throw new Error('Failed to create product entitiy state');
-      }
-    },
-    deleteProductEntityState: async (_, { name }) => {
-      try {
-        await ProductEntityStateService.remove(name);
-        return true;
-      } catch (error) {
-        console.log('error', error);
-        throw new Error('Failed to delete product entitiy state');
+        if (error instanceof RequestError) return error.toResponse();
+        else throw new Error('Failed to put product entity state');
       }
     }
   }
 };
 
-export default {
-    typeDef,
-    resolvers
-};
+export default resolvers;

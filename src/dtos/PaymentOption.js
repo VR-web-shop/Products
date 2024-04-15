@@ -1,5 +1,5 @@
 
-export default function DeliverOptionDTO(description, entity) {
+export default function PaymentOptionDTO(description, entity) {
     if (!description || typeof description !== "object") {
         throw new Error("description is required and must be an object");
     }

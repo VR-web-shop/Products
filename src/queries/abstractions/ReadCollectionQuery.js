@@ -1,7 +1,7 @@
 import ModelQuery from "./ModelQuery.js";
 
 export default class ReadCollectionQuery extends ModelQuery {
-    constructor(options={}, dto, modelName, snapshotName, tombstoneName) {
+    constructor(options = {}, dto, modelName, snapshotName = null, tombstoneName = null) {
         super();
         if (typeof options !== "object") {
             throw new Error("Options must be an object");
@@ -15,12 +15,12 @@ export default class ReadCollectionQuery extends ModelQuery {
             throw new Error("modelName is required and must be a string");
         }
 
-        if (!snapshotName || typeof snapshotName !== "string") {
-            throw new Error("snapshotName is required and must be a string");
+        if (snapshotName && typeof snapshotName !== "string") {
+            throw new Error("if using snapshots, snapshotName is required and must be a string");
         }
 
-        if (!tombstoneName || typeof tombstoneName !== "string") {
-            throw new Error("tombstoneName is required and must be a string");
+        if (tombstoneName && typeof tombstoneName !== "string") {
+            throw new Error("if using tombstones, tombstoneName is required and must be a string");
         }
 
         this.options = options;
@@ -44,39 +44,45 @@ export default class ReadCollectionQuery extends ModelQuery {
         const limit = options.limit || 10;
         const page = options.page || 1;
         const offset = (page - 1) * limit;
-        const where = options.where || {};
-        const params = { limit, offset, where };
 
+        const where = options.where || {};
         const count = await db[modelName].count({ where: params.where });
         const pages = Math.ceil(count / limit);
-        const entities = await db[modelName].findAll({
-            ...params,
-            include: [
-                { 
-                    model: db[snapshotName],
-                    required: false,
-                    order: [["created_at", "DESC"]],
-                    limit: 1
-                },
-                {
-                    model: db[tombstoneName],
-                    required: false,
-                    order: [["created_at", "DESC"]],
-                    limit: 1
-                }
-            ]
-        });
 
+        const params = { limit, offset, where, include: [] };
+
+        if (snapshotName) {
+            params.include.push({
+                model: db[snapshotName],
+                order: [["created_at", "DESC"]],
+                limit: 1
+            });
+        }
+
+        if (tombstoneName) {
+            params.include.push({
+                model: db[tombstoneName],
+                order: [["created_at", "DESC"]],
+                limit: 1
+            });
+        }
+
+        const entities = await db[modelName].findAll(params);
         const rows = [];
         entities.forEach(entity => {
-            const hasTombstone = entity[`${tombstoneName}s`] && entity[`${tombstoneName}s`].length > 0;
-            if (hasTombstone) return;
+            if (tombstoneName) {
+                const hasTombstone = entity[`${tombstoneName}s`] && entity[`${tombstoneName}s`].length > 0;
+                if (hasTombstone) return;
+            }
 
-            const snapshot = entity[`${snapshotName}s`][0];
-
-            rows.push(dto(snapshot, entity));
+            if (snapshotName) {
+                const snapshot = entity[`${snapshotName}s`][0];
+                rows.push(dto(snapshot, entity));
+            } else {
+                rows.push(dto(entity));
+            }
         });
-        
+
         return { rows, pages, count };
     }
 }

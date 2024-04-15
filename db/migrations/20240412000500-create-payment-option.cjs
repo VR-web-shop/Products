@@ -3,31 +3,23 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('PaymentOptions', {
-      name: {
-        primaryKey: true,
-        allowNull: false,
-        type: Sequelize.STRING
-      },
-      price: {
-        type: Sequelize.FLOAT,
-        allowNull: false
+      clientSideUUID: {
+        type: Sequelize.STRING,
+        field: 'client_side_uuid',
+        primaryKey: true
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('now'),
-        field: 'created_at'
+        field: 'created_at',
+        defaultValue: Sequelize.fn('now')
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('now'),
-        field: 'updated_at'
+        field: 'updated_at',
+        defaultValue: Sequelize.fn('now')
       },
-      deletedAt: {
-        type: Sequelize.DATE,
-        field: 'deleted_at'
-      }
     });
   },
   async down(queryInterface, Sequelize) {

@@ -3,17 +3,29 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    const demoProducts = require('../../demo_products.json');
-    const CDNUrl = process.env.S3_CDN_URL
-    const { products } = demoProducts;
-    products.forEach(async product => {
-        product.thumbnail_source = CDNUrl + "/" + product.thumbnail_source;
+    const data = require('../../demo_products.json');
+    const products = []
+    const productDescriptions = []
+
+    data.products.forEach(async product => {        
+        const { client_side_uuid, name, description, price, thumbnail_source } = product;
+
+        products.push({ client_side_uuid });
+        productDescriptions.push({ 
+          name, 
+          description, 
+          price, 
+          thumbnail_source: `${process.env.S3_CDN_URL}/${thumbnail_source}`,
+          product_client_side_uuid: client_side_uuid 
+        });
     });
 
     await queryInterface.bulkInsert('Products', products, {});
+    await queryInterface.bulkInsert('ProductDescriptions', productDescriptions, {});
   },
 
   async down (queryInterface, Sequelize) {
     await queryInterface.bulkDelete('Products', null, {});
+    await queryInterface.bulkDelete('ProductDescriptions', null, {});
   }
 };

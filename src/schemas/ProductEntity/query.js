@@ -1,40 +1,38 @@
-import ProductEntityService from "../../services/ProductEntityService.js";
+import RequestError from "../RequestError/RequestError.js";
+import ModelQueryService from "../../services/ModelQueryService.js";
+import ReadOneQuery from "../../queries/ProductEntity/ReadOneQuery.js";
+import ReadCollectionQuery from "../../queries/ProductEntity/ReadCollectionQuery.js";
+import Restricted from "../../jwt/Restricted.js";
 
-const typeDef = `
-  type ProductEntity {
-    uuid: String
-    product_entity_state_name: String!
-    product_uuid: String!
-  }
-
-  type Query {
-    productEntities(limit: Float, offset: Float): [ProductEntity]
-    productEntity(uuid: String!): ProductEntity
-  }
-`;
+const service = ModelQueryService();
 
 const resolvers = {
   Query: {
-    productEntities: async (_, {limit=10, offset=0}) => {
-        try {
-            return await ProductEntityService.findAll(limit, offset);
-        } catch (error) {
-            console.log('error', error);
-            throw new Error('Failed to get product entities');
-        }
-    },
-    productEntity: async (_, { uuid }) => {
-      try {
-        return await ProductEntityService.find(uuid);
-      } catch (error) {
-        console.log('error', error);
-        throw new Error('Failed to get product entity');
-      }
-    }
+	productEntities: async (_, { limit, page }, context) => {
+		try {
+			return await Restricted({ context, permission: 'product-entities:index' }, async () => {
+				const { rows, pages, count } = await service.invoke(new ReadCollectionQuery({ limit, page }));
+				return { __typename: 'ProductEntities', rows, pages, count };
+			})
+		} catch (error) {
+			console.log('error', error);
+			if (error instanceof RequestError) return error.toResponse();
+			else throw new Error('Failed to get product entities');
+		}
+	},
+	productEntity: async (_, { clientSideUUID }, context) => {
+		try {
+			return await Restricted({ context, permission: 'product-entities:show' }, async () => {
+				const entity = await service.invoke(new ReadOneQuery(clientSideUUID));
+				return { __typename: 'ProductEntity', ...entity };
+			})
+		} catch (error) {
+			console.log('error', error);
+			if (error instanceof RequestError) return error.toResponse();
+			else throw new Error('Failed to get product entity');
+		}
+	}
   }
 };
 
-export default {
-    typeDef,
-    resolvers
-};
+export default resolvers;

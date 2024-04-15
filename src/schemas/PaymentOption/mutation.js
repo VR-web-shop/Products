@@ -22,7 +22,7 @@ const resolvers = {
             } catch (error) {
                 console.log('error', error);
                 if (error instanceof RequestError) return error.toResponse();
-                else throw new Error('Failed to get payment options');
+                else throw new Error('Failed to put payment options');
             }
         },
         deletePaymentOption: async (_, { clientSideUUID }) => {

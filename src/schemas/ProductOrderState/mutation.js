@@ -1,40 +1,30 @@
-import ProductOrderStateService from "../../services/ProductOrderStateService.js";
+import RequestError from "../RequestError/RequestError.js";
+import ModelQueryService from "../../services/ModelQueryService.js";
+import ModelCommandService from "../../services/ModelCommandService.js";
+import ReadOneQuery from "../../queries/ProductOrderState/ReadOneQuery.js";
+import CreateCommand from "../../commands/ProductOrderState/CreateCommand.js";
+import Restricted from "../../jwt/Restricted.js";
 
-const typeDef = `
-  type Mutation {
-    createProductOrderState(input: ProductOrderStateInput!): ProductOrderState
-    deleteProductOrderState(name: String!): Boolean
-  }
-
-  input ProductOrderStateInput {
-    name: String!
-  }
-`;
+const commandService = ModelCommandService();
+const queryService = ModelQueryService();
 
 const resolvers = {
   Mutation: {
     createProductOrderState: async (_, { input }) => {
       try {
-        const { name } = input;
-        return await ProductOrderStateService.create(name);
+        return await Restricted({ context, permission: 'product-order-states:put' }, async () => {
+          const { name } = input;
+          await commandService.invoke(new CreateCommand(name));
+          const entity = await queryService.invoke(new ReadOneQuery(name));
+          return { __typename: 'ProductOrderState', ...entity };
+        })
       } catch (error) {
         console.log('error', error);
-        throw new Error('Failed to create product order state');
+        if (error instanceof RequestError) return error.toResponse();
+        else throw new Error('Failed to put product entity state');
       }
     },
-    deleteProductOrderState: async (_, { name }) => {
-      try {
-        await ProductOrderStateService.remove(name);
-        return true;
-      } catch (error) {
-        console.log('error', error);
-        throw new Error('Failed to delete product order state');
-      }
-    }
   }
 };
 
-export default {
-    typeDef,
-    resolvers
-};
+export default resolvers;

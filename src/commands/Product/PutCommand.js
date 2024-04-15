@@ -6,11 +6,11 @@ export default class PutCommand extends _PutCommand {
             clientSideUUID, 
             params, 
             "client_side_uuid",
-            "payment_option_client_side_uuid", 
-            ["name", "price"],
-            "PaymentOption",
-            "PaymentOptionDescription",
-            "PaymentOptionRemoved"
+            "product_client_side_uuid", 
+            ["name", "description", "price", "thumbnail_source"],
+            "Product",
+            "ProductDescription",
+            "ProductRemoved"
         );
     }
 }
