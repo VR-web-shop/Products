@@ -1,9 +1,8 @@
 import 'dotenv/config'
 
-import GraphQLSchema from './src/schemas/base.js'
-import MessageBroker from './src/config/BrokerConfig.js';
+import GraphQLHandler from './src/schemas/base.js'
+import BrokerService from './src/services/BrokerService.js';
 
-import { createHandler } from 'graphql-http/lib/use/express';
 import express from 'express';
 import cors from 'cors';
 
@@ -11,29 +10,27 @@ import cors from 'cors';
     /**
      * Connect to message broker
      */
-    await MessageBroker.connect();
+    await BrokerService.connect();
 
     /**
      * Create express app
      */
     const app = express();
     const port = process.env.SERVER_PORT;
+    const origins = process.env.CORS_ORIGINS.split(',');
 
     /**
      * Configure express
      */
-    app.use(cors({origin: '*'}));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
+    origins.forEach(origin => app.use(cors({ origin })));
 
     /**
      * Add GraphQL endpoint
      */
-    const graphqlHandler = createHandler({
-        schema: GraphQLSchema,
-    });
-    app.get('/graphql', graphqlHandler);
-    app.post('/graphql', graphqlHandler);
+    app.get('/graphql', GraphQLHandler);
+    app.post('/graphql', GraphQLHandler);
 
     /**
      * Start server

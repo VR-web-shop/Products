@@ -3,14 +3,10 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('DeliverOptions', {
-      name: {
-        allowNull: false,
-        primaryKey: true,
-        type: Sequelize.STRING
-      },
-      price: {
-        type: Sequelize.FLOAT,
-        allowNull: false
+      clientSideUUID: {
+        type: Sequelize.STRING,
+        field: 'client_side_uuid',
+        primaryKey: true
       },
       createdAt: {
         allowNull: false,
@@ -24,10 +20,6 @@ module.exports = {
         field: 'updated_at',
         defaultValue: Sequelize.fn('now')
       },
-      deletedAt: {
-        type: Sequelize.DATE,
-        field: 'deleted_at'
-      }
     });
   },
   async down(queryInterface, Sequelize) {

@@ -1,7 +1,7 @@
-import paymentoption from "../../db/models/paymentoption.cjs";
-import db from "../../db/models/index.cjs";
+import PaymentOptionRead from "../models/PaymentOptionRead.js";
+import ModelQueryService from "./ModelQueryService.js";
 
-const Model = paymentoption(db.sequelize, db.Sequelize.DataTypes);
+const service = ModelQueryService(PaymentOptionRead());
 
 const find = async (name) => {
     const paymentOption = await Model.findOne({ where: { name } });

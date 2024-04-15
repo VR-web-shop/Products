@@ -43,7 +43,7 @@ beforeAll(async () => {
 });
 
 test('valutaSettings queries fetches all valuta settings', async () => { 
-  const { data } = await tester.graphql('{ valutaSettings { name } }');
+  const { data } = await tester.graphql('{ valutaSettings(offset: 0, limit: 10) { name } }');
   expect(data.valutaSettings.length).toBe(3);
 });
 

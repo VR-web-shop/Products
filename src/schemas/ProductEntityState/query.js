@@ -1,4 +1,4 @@
-import ProductEntityStateService from "../../services/ProductEntityStateService";
+import ProductEntityStateService from "../../services/ProductEntityStateService.js";
 
 const typeDef = `
   type ProductEntityState {
@@ -6,7 +6,7 @@ const typeDef = `
   }
 
   type Query {
-    productEntityStates: [ProductEntityState]
+    productEntityStates(limit: Float, offset: Float): [ProductEntityState]
     productEntityState(name: String!): ProductEntityState
   }
 `;
@@ -17,6 +17,7 @@ const resolvers = {
         try {
             return await ProductEntityStateService.findAll(limit, offset);
         } catch (error) {
+            console.log('error', error);
             throw new Error('Failed to get product entity states');
         }
     },
@@ -24,6 +25,7 @@ const resolvers = {
       try {
         return await ProductEntityStateService.find(name);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to get product entity state');
       }
     }

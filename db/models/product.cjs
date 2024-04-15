@@ -10,20 +10,34 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Product.hasMany(models.ProductEntity);
+      //Product.hasMany(models.ProductEntity);
+      models.Product.hasMany(models.ProductDescription, {
+        foreignKey: 'product_client_side_uuid',
+        sourceKey: 'client_side_uuid',
+      });
+      models.Product.hasMany(models.ProductRemoved, {
+        foreignKey: 'product_client_side_uuid',
+        sourceKey: 'client_side_uuid',
+      });
     }
   }
   Product.init({
-    uuid: DataTypes.UUID,
-    name: DataTypes.STRING,
-    description: DataTypes.STRING,
-    thumbnail_source: DataTypes.STRING,
-    price: DataTypes.FLOAT
+    client_side_uuid: {
+      type: DataTypes.STRING,
+      field: 'client_side_uuid',
+      primaryKey: true,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      field: 'created_at',
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: 'updated_at',
+    }
   }, {
     sequelize,
-    modelName: 'Product',
-    paranoid: true,
-    underscored: true
+    modelName: 'Product'
   });
   return Product;
 };

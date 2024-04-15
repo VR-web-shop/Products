@@ -10,19 +10,33 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      models.ValutaSetting.hasMany(models.ValutaSettingDescription, {
+        foreignKey: 'valuta_setting_client_side_uuid',
+        sourceKey: 'client_side_uuid',
+      });
+      models.ValutaSetting.hasMany(models.ValutaSettingRemoved, {
+        foreignKey: 'valuta_setting_client_side_uuid',
+        sourceKey: 'client_side_uuid',
+      });
     }
   }
   ValutaSetting.init({
-    name: DataTypes.STRING,
-    short: DataTypes.STRING,
-    symbol: DataTypes.STRING,
-    active: DataTypes.BOOLEAN
+    client_side_uuid: {
+      type: DataTypes.STRING,
+      field: 'client_side_uuid',
+      primaryKey: true,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      field: 'created_at',
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: 'updated_at',
+    }
   }, {
     sequelize,
-    modelName: 'ValutaSetting',
-    paranoid: true,
-    underscored: true
+    modelName: 'ValutaSetting'
   });
   return ValutaSetting;
 };

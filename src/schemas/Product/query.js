@@ -10,7 +10,7 @@ const typeDef = `
   }
 
   type Query {
-    products: [Product]
+    products(limit: Float, offset: Float): [Product]
     product(uuid: String!): Product
   }
 `;
@@ -21,6 +21,7 @@ const resolvers = {
         try {
             return await ProductService.findAll(limit, offset);
         } catch (error) {
+            console.log('error', error);
             throw new Error('Failed to get products');
         }
     },
@@ -28,6 +29,7 @@ const resolvers = {
       try {
         return await ProductService.find(uuid);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to get product');
       }
     }

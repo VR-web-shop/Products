@@ -22,6 +22,7 @@ const resolvers = {
         const { name, short, symbol, active } = input;
         return await ValutaSettingService.create(name, short, symbol, active);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to create valuta setting');
       }
     },
@@ -30,6 +31,7 @@ const resolvers = {
         const { name, short, symbol, active } = input;
         return await ValutaSettingService.update(name, short, symbol, active);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to update valuta setting');
       }
     },
@@ -38,6 +40,7 @@ const resolvers = {
         await ValutaSettingService.remove(name);
         return true;
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to delete valuta setting');
       }
     }

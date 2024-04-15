@@ -1,37 +1,39 @@
-import PaymentOptionService from "../../services/PaymentOptionService";
 
-const typeDef = `
-  type PaymentOption {
-    name: String!
-    price: Float!
-  }
+import RequestError from "../RequestError/RequestError.js";
+import ModelQueryService from "../../services/ModelQueryService.js";
+import ReadOneQuery from "../../queries/PaymentOption/ReadOneQuery.js";
+import ReadCollectionQuery from "../../queries/PaymentOption/ReadCollectionQuery.js";
+import Restricted from "../../jwt/Restricted.js";
 
-  type Query {
-    paymentOptions: [PaymentOption]
-    paymentOption(name: String!): PaymentOption
-  }
-`;
+const service = ModelQueryService();
 
 const resolvers = {
-  Query: {
-    paymentOptions: async (_, {limit=10, offset=0}) => {
-        try {
-            return await PaymentOptionService.findAll(limit, offset);
-        } catch (error) {
-            throw new Error('Failed to get payment options');
+    Query: {
+        paymentOptions: async (_, { limit, page }, context) => {
+            try {
+                return await Restricted({ context, permission: 'payment-options:index' }, async () => {
+                    const { rows, pages, count } = await service.invoke(new ReadCollectionQuery({ limit, page }));
+                    return { __typename: 'PaymentOptions', rows, pages, count };
+                })
+            } catch (error) {
+                console.log('error', error);
+                if (error instanceof RequestError) return error.toResponse();
+                else throw new Error('Failed to get payment options');
+            }
+        },
+        paymentOption: async (_, { clientSideUUID }, context) => {
+            try {
+                return await Restricted({ context, permission: 'payment-options:show' }, async () => {
+                    const entity = await service.invoke(new ReadOneQuery(clientSideUUID));
+                    return { __typename: 'PaymentOption', ...entity };
+                })
+            } catch (error) {
+                console.log('error', error);
+                if (error instanceof RequestError) return error.toResponse();
+                else throw new Error('Failed to get payment option');
+            }
         }
-    },
-    paymentOption: async (_, { name }) => {
-      try {
-        return await PaymentOptionService.find(name);
-      } catch (error) {
-        throw new Error('Failed to get payment option');
-      }
     }
-  }
 };
 
-export default {
-    typeDef,
-    resolvers
-};
+export default resolvers;

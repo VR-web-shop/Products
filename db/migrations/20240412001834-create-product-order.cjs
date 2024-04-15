@@ -49,12 +49,12 @@ module.exports = {
         type: Sequelize.DATE,
         field: 'deleted_at'
       },
-      deliver_option_name: {
+      deliver_option_client_side_uuid: {
         type: Sequelize.STRING,
         allowNull: false,
         references: {
           model: 'DeliverOptions',
-          key: 'name'
+          key: 'client_side_uuid'
         }
       },
       payment_option_name: {

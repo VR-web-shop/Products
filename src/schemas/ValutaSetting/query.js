@@ -9,7 +9,7 @@ const typeDef = `
   }
 
   type Query {
-    valutaSettings: [ValutaSetting]
+    valutaSettings(limit: Float, offset: Float): [ValutaSetting]
     valutaSetting(name: String!): ValutaSetting
   }
 `;
@@ -18,15 +18,17 @@ const resolvers = {
   Query: {
     valutaSettings: async (_, {limit=10, offset=0}) => {
         try {
-            return await ValutaSettingService.findAll(limit, offset);
+          return await ValutaSettingService.findAll(limit, offset);
         } catch (error) {
-            throw new Error('Failed to get valuta setting');
+          console.log('error', error);
+          throw new Error('Failed to get valuta setting');
         }
     },
     valutaSetting: async (_, { name }) => {
       try {
         return await ValutaSettingService.find(name);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to get valuta setting');
       }
     }

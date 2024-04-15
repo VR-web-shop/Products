@@ -21,6 +21,7 @@ const resolvers = {
         const { product_entity_state_name, product_uuid } = input;
         return await ProductEntityService.create(product_entity_state_name, product_uuid);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to create product entity');
       }
     },
@@ -29,6 +30,7 @@ const resolvers = {
         const { uuid, product_entity_state_name, product_uuid } = input;
         return await ProductEntityService.update(uuid, product_entity_state_name, product_uuid);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to update product entity');
       }
     },
@@ -37,6 +39,7 @@ const resolvers = {
         await ProductEntityService.remove(uuid);
         return true;
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to delete product entity');
       }
     }

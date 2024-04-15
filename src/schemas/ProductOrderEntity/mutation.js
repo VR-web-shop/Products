@@ -1,4 +1,4 @@
-import ProductOrderEntityService from "../../services/ProductOrderEntityService";
+import ProductOrderEntityService from "../../services/ProductOrderEntityService.js";
 
 const typeDef = `
   type Mutation {
@@ -21,6 +21,7 @@ const resolvers = {
         const { product_order_uuid, product_entity_uuid } = input;
         return await ProductOrderEntityService.create(product_order_uuid, product_entity_uuid);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to create product order entity');
       }
     },
@@ -29,6 +30,7 @@ const resolvers = {
         const { uuid, product_order_uuid, product_entity_uuid } = input;
         return await ProductOrderEntityService.update(uuid, product_order_uuid, product_entity_uuid);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to update product order entity');
       }
     },
@@ -37,6 +39,7 @@ const resolvers = {
         await ProductOrderEntityService.remove(uuid);
         return true;
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to delete product order entity');
       }
     }

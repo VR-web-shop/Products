@@ -106,7 +106,7 @@ beforeAll(async () => {
 });
 
 test('productOrderEntities queries fetches all product order entities', async () => { 
-  const { data } = await tester.graphql('{ productOrderEntities { uuid } }');
+  const { data } = await tester.graphql('{ productOrderEntities(offset: 0, limit: 10) { uuid } }');
   expect(data.productOrderEntities.length).toBe(3);
 });
 

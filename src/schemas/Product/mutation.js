@@ -23,6 +23,7 @@ const resolvers = {
         const { name, description, thumbnail_source, price } = input;
         return await ProductService.create(name, description, thumbnail_source, price);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to create product');
       }
     },
@@ -31,6 +32,7 @@ const resolvers = {
         const { uuid, name, description, thumbnail_source, price } = input;
         return await ProductService.update(uuid, name, description, thumbnail_source, price);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to update product');
       }
     },
@@ -39,6 +41,7 @@ const resolvers = {
         await ProductService.remove(uuid);
         return true;
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to delete product');
       }
     }

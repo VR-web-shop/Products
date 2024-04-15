@@ -1,11 +1,16 @@
 import { mergeTypeDefs, mergeResolvers } from "@graphql-tools/merge";
 import { makeExecutableSchema } from "@graphql-tools/schema";
+import { createHandler } from 'graphql-http/lib/use/express';
+
+import RequestErrorTypeDef from "./RequestError/typeDef.js";
 
 import DeliverOptionMutation from "./DeliverOption/mutation.js";
 import DeliverOptionQuery from "./DeliverOption/query.js";
+import DeliverOptionTypeDef from "./DeliverOption/typeDef.js";
 
 import PaymentOptionMutation from "./PaymentOption/mutation.js";
 import PaymentOptionQuery from "./PaymentOption/query.js";
+import PaymentOptionTypeDef from "./PaymentOption/typeDef.js";
 
 import ProductMutation from "./Product/mutation.js";
 import ProductQuery from "./Product/query.js";
@@ -29,10 +34,8 @@ import ValutaSettingMutation from "./ValutaSetting/mutation.js";
 import ValutaSettingQuery from "./ValutaSetting/query.js";
 
 const typeDefs = mergeTypeDefs([
-    DeliverOptionQuery.typeDef,
-    DeliverOptionMutation.typeDef,
-    PaymentOptionQuery.typeDef,
-    PaymentOptionMutation.typeDef,
+    DeliverOptionTypeDef,
+    PaymentOptionTypeDef,
     ProductQuery.typeDef,
     ProductMutation.typeDef,
     ProductEntityQuery.typeDef,
@@ -47,13 +50,14 @@ const typeDefs = mergeTypeDefs([
     ProductOrderStateMutation.typeDef,
     ValutaSettingQuery.typeDef,
     ValutaSettingMutation.typeDef,
+    RequestErrorTypeDef,
 ]);
 
 const resolvers = mergeResolvers([
-    DeliverOptionQuery.resolvers,
-    DeliverOptionMutation.resolvers,
-    PaymentOptionQuery.resolvers,
-    PaymentOptionMutation.resolvers,
+    DeliverOptionQuery,
+    DeliverOptionMutation,
+    PaymentOptionQuery,
+    PaymentOptionMutation,
     ProductQuery.resolvers,
     ProductMutation.resolvers,
     ProductEntityQuery.resolvers,
@@ -70,4 +74,16 @@ const resolvers = mergeResolvers([
     ValutaSettingMutation.resolvers,
 ]);
 
-export default makeExecutableSchema({ typeDefs, resolvers });
+const schema = makeExecutableSchema({ 
+    typeDefs, 
+    resolvers,
+});
+
+const context = async (req, res, next ) => {
+    return { req, res, next };
+};
+
+export default createHandler({
+    schema,
+    context
+});

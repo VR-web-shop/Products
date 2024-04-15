@@ -15,7 +15,7 @@ const typeDef = `
   }
 
   type Query {
-    productOrders: [ProductOrder]
+    productOrders(limit: Float, offset: Float): [ProductOrder]
     productOrder(uuid: String!): ProductOrder
   }
 `;
@@ -24,15 +24,17 @@ const resolvers = {
   Query: {
     productOrders: async (_, {limit=10, offset=0}) => {
         try {
-            return await ProductOrderService.findAll(limit, offset);
+          return await ProductOrderService.findAll(limit, offset);
         } catch (error) {
-            throw new Error('Failed to get product orders');
+          console.log('error', error);
+          throw new Error('Failed to get product orders');
         }
     },
     productOrder: async (_, { uuid }) => {
       try {
         return await ProductOrderService.find(uuid);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to get product order');
       }
     }

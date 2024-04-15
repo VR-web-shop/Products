@@ -8,7 +8,7 @@ const typeDef = `
   }
 
   type Query {
-    productEntities: [ProductEntity]
+    productEntities(limit: Float, offset: Float): [ProductEntity]
     productEntity(uuid: String!): ProductEntity
   }
 `;
@@ -19,6 +19,7 @@ const resolvers = {
         try {
             return await ProductEntityService.findAll(limit, offset);
         } catch (error) {
+            console.log('error', error);
             throw new Error('Failed to get product entities');
         }
     },
@@ -26,6 +27,7 @@ const resolvers = {
       try {
         return await ProductEntityService.find(uuid);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to get product entity');
       }
     }

@@ -1,4 +1,4 @@
-import ProductEntityStateService from "../../services/ProductEntityStateService";
+import ProductEntityStateService from "../../services/ProductEntityStateService.js";
 
 const typeDef = `
   type Mutation {
@@ -18,6 +18,7 @@ const resolvers = {
         const { name } = input;
         return await ProductEntityStateService.create(name);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to create product entitiy state');
       }
     },
@@ -26,6 +27,7 @@ const resolvers = {
         await ProductEntityStateService.remove(name);
         return true;
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to delete product entitiy state');
       }
     }

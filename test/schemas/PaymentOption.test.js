@@ -28,7 +28,7 @@ beforeAll(async () => {
 });
 
 test('paymentOptions queries fetches all payment options', async () => { 
-  const { data } = await tester.graphql('{ paymentOptions { name } }');
+  const { data } = await tester.graphql('{ paymentOptions(offset: 0, limit: 10) { name } }');
   expect(data.paymentOptions.length).toBe(3);
 });
 

@@ -27,7 +27,7 @@ beforeAll(async () => {
 });
 
 test('productOrderStates queries fetches all product order state', async () => { 
-  const { data } = await tester.graphql('{ productOrderStates { name } }');
+  const { data } = await tester.graphql('{ productOrderStates(offset: 0, limit: 10) { name } }');
   expect(data.productOrderStates.length).toBe(2);
 });
 

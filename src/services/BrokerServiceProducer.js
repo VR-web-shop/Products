@@ -1,3 +1,4 @@
+import BrokerService from "./BrokerService.js"
 
 const CONSUMERS = {
     SHOPPING_CART: 'shopping_cart',
@@ -15,7 +16,7 @@ const QUEUES = {
     DELETE_PRODUCT_ORDER: 'delete_product_order',
 }
 
-const BrokerServiceProducer = function(BrokerService) {
+const BrokerServiceProducer = function(brokerService=BrokerService) {
     
     /**
      * @function newProduct
@@ -27,7 +28,7 @@ const BrokerServiceProducer = function(BrokerService) {
         const consumers = [CONSUMERS.SHOPPING_CART, CONSUMERS.SCENES];
 
         for (const consumer of consumers) {
-            BrokerService.sendMessage(`${consumer}_${queue}`, product);
+            brokerService.sendMessage(`${consumer}_${queue}`, product);
         }
     }
 
@@ -41,7 +42,7 @@ const BrokerServiceProducer = function(BrokerService) {
         const consumers = [CONSUMERS.SHOPPING_CART, CONSUMERS.SCENES];
 
         for (const consumer of consumers) {
-            BrokerService.sendMessage(`${consumer}_${queue}`, product);
+            brokerService.sendMessage(`${consumer}_${queue}`, product);
         }
     }
 
@@ -55,7 +56,7 @@ const BrokerServiceProducer = function(BrokerService) {
         const consumers = [CONSUMERS.SHOPPING_CART, CONSUMERS.SCENES];
 
         for (const consumer of consumers) {
-            BrokerService.sendMessage(`${consumer}_${queue}`, product);
+            brokerService.sendMessage(`${consumer}_${queue}`, product);
         }
     }
 
@@ -69,7 +70,7 @@ const BrokerServiceProducer = function(BrokerService) {
         const consumers = [CONSUMERS.SHOPPING_CART, CONSUMERS.SCENES];
 
         for (const consumer of consumers) {
-            BrokerService.sendMessage(`${consumer}_${queue}`, productEntity);
+            brokerService.sendMessage(`${consumer}_${queue}`, productEntity);
         }
     }
 
@@ -83,7 +84,7 @@ const BrokerServiceProducer = function(BrokerService) {
         const consumers = [CONSUMERS.SHOPPING_CART, CONSUMERS.SCENES];
 
         for (const consumer of consumers) {
-            BrokerService.sendMessage(`${consumer}_${queue}`, productEntity);
+            brokerService.sendMessage(`${consumer}_${queue}`, productEntity);
         }
     }
 
@@ -97,7 +98,7 @@ const BrokerServiceProducer = function(BrokerService) {
         const consumers = [CONSUMERS.SHOPPING_CART, CONSUMERS.SCENES];
 
         for (const consumer of consumers) {
-            BrokerService.sendMessage(`${consumer}_${queue}`, productEntity);
+            brokerService.sendMessage(`${consumer}_${queue}`, productEntity);
         }
     }
 
@@ -111,7 +112,7 @@ const BrokerServiceProducer = function(BrokerService) {
         const consumers = [CONSUMERS.SHOPPING_CART];
 
         for (const consumer of consumers) {
-            BrokerService.sendMessage(`${consumer}_${queue}`, productOrder);
+            brokerService.sendMessage(`${consumer}_${queue}`, productOrder);
         }
     }
 
@@ -125,7 +126,7 @@ const BrokerServiceProducer = function(BrokerService) {
         const consumers = [CONSUMERS.SHOPPING_CART];
 
         for (const consumer of consumers) {
-            BrokerService.sendMessage(`${consumer}_${queue}`, productOrder);
+            brokerService.sendMessage(`${consumer}_${queue}`, productOrder);
         }
     }
 }

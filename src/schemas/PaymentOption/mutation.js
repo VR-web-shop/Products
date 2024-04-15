@@ -1,48 +1,43 @@
-import PaymentOptionService from "../../services/PaymentOptionService.js";
+import RequestError from "../RequestError/RequestError.js";
+import ModelQueryService from "../../services/ModelQueryService.js";
+import ModelCommandService from "../../services/ModelCommandService.js";
+import ReadOneQuery from "../../queries/PaymentOption/ReadOneQuery.js";
+import PutCommand from "../../commands/PaymentOption/PutCommand.js";
+import DeleteCommand from "../../commands/PaymentOption/DeleteCommand.js";
+import Restricted from "../../jwt/Restricted.js";
 
-const typeDef = `
-  type Mutation {
-    createPaymentOption(input: PaymentOptionInput!): PaymentOption
-    updatePaymentOption(input: PaymentOptionInput!): PaymentOption
-    deletePaymentOption(name: String!): Boolean
-  }
-
-  input PaymentOptionInput {
-    name: String!
-    price: Float!
-  }
-`;
+const commandService = ModelCommandService();
+const queryService = ModelQueryService();
 
 const resolvers = {
-  Mutation: {
-    createPaymentOption: async (_, { input }) => {
-      try {
-        const { name, price } = input;
-        return await PaymentOptionService.create(name, price);
-      } catch (error) {
-        throw new Error('Failed to create payment option');
-      }
-    },
-    updatePaymentOption: async (_, { input  }) => {
-      try {
-        const { name, price } = input;
-        return await PaymentOptionService.update(name, price);
-      } catch (error) {
-        throw new Error('Failed to update payment option');
-      }
-    },
-    deletePaymentOption: async (_, { name }) => {
-      try {
-        await PaymentOptionService.remove(name);
-        return true;
-      } catch (error) {
-        throw new Error('Failed to delete payment option');
-      }
+    Mutation: {
+        putPaymentOption: async (_, { input }, context) => {
+            try {
+                return await Restricted({ context, permission: 'payment-options:put' }, async () => {
+                    const { clientSideUUID, name, price } = input;
+                    await commandService.invoke(new PutCommand(clientSideUUID, { name, price }));
+                    const entity = await queryService.invoke(new ReadOneQuery(clientSideUUID));
+                    return { __typename: 'PaymentOption', ...entity };
+                })
+            } catch (error) {
+                console.log('error', error);
+                if (error instanceof RequestError) return error.toResponse();
+                else throw new Error('Failed to get payment options');
+            }
+        },
+        deletePaymentOption: async (_, { clientSideUUID }) => {
+            try {
+                return await Restricted({ context, permission: 'payment-options:delete' }, async () => {
+                    await commandService.invoke(new DeleteCommand(clientSideUUID));
+                    return { __typename: 'BooleanResult', result: true };
+                })
+            } catch (error) {
+                console.log('error', error);
+                if (error instanceof RequestError) return error.toResponse();
+                else throw new Error('Failed to delete payment options');
+            }
+        }
     }
-  }
 };
 
-export default {
-    typeDef,
-    resolvers
-};
+export default resolvers;

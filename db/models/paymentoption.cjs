@@ -10,16 +10,34 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      PaymentOption.hasMany(models.ProductOrder);
+      //PaymentOption.hasMany(models.ProductOrder);
+      models.PaymentOption.hasMany(models.PaymentOptionDescription, {
+        foreignKey: 'payment_option_client_side_uuid',
+        sourceKey: 'client_side_uuid',
+      });
+      models.PaymentOption.hasMany(models.PaymentOptionRemoved, {
+        foreignKey: 'payment_option_client_side_uuid',
+        sourceKey: 'client_side_uuid',
+      });
     }
   }
   PaymentOption.init({
-    name: DataTypes.STRING,
-    price: DataTypes.FLOAT
+    client_side_uuid: {
+      type: DataTypes.STRING,
+      field: 'client_side_uuid',
+      primaryKey: true,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      field: 'created_at',
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: 'updated_at',
+    }
   }, {
     sequelize,
     modelName: 'PaymentOption',
-    paranoid: true,
     underscored: true
   });
   return PaymentOption;

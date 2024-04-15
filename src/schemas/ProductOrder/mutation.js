@@ -48,6 +48,7 @@ const resolvers = {
             product_order_state_name
         );
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to create product order');
       }
     },
@@ -78,6 +79,7 @@ const resolvers = {
           product_order_state_name
         );
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to update product order');
       }
     },
@@ -86,6 +88,7 @@ const resolvers = {
         await ProductOrderService.remove(uuid);
         return true;
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to delete product order');
       }
     }

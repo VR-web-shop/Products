@@ -1,49 +1,60 @@
+import MiddlewareJWT from "../jwt/MiddlewareJWT.js";
 import deliveroption from "../../db/models/deliveroption.cjs";
 import db from "../../db/models/index.cjs";
 
-const Model = deliveroption(db.sequelize, db.Sequelize.DataTypes);
+const DeliverOptionService = (
+    context = null,
+    permission = null,
+    contextHandler = MiddlewareJWT.AuthorizeContextHandler,
+    Model = deliveroption(db.sequelize, db.Sequelize.DataTypes),
+) => {
+    if (context) contextHandler(context, permission)
 
-const find = async (name) => {
-    const deliverOption = await Model.findOne({ where: { name } });
-    if (!deliverOption) {
-        throw new Error('Deliver option not found');
-    }
-    return deliverOption;
-}
+    const find = async (name) => {
+        const deliverOption = await Model.findOne({ where: { name } });
+        if (!deliverOption) {
+            throw new Error('Deliver option not found');
+        }
 
-const findAll = async (limit=10, offset=0) => {
-    return await Model.findAll({ limit, offset });
-}
-
-const findAllWhere = async (where) => {
-    return await Model.findAll({ where });
-}
-
-const create = async (name, price) => {
-    const deliverOption = await Model.findOne({ where: { name } });
-    if (deliverOption) {
-        throw new Error('Deliver option with ' + name + ' already exists');
+        return deliverOption;
     }
 
-    return await Model.create({ name, price });
+    const findAll = async (limit = 10, offset = 0) => {
+        return await Model.findAll({ limit, offset });
+    }
+
+    const findAllWhere = async (where) => {
+        return await Model.findAll({ where });
+    }
+
+    const create = async (name, price) => {
+        const deliverOption = await Model.findOne({ where: { name } });
+        if (deliverOption) {
+            throw new Error('Deliver option with ' + name + ' already exists');
+        }
+
+        return await Model.create({ name, price });
+    }
+
+    const update = async (name, price) => {
+        const deliverOption = await find(name);
+        await deliverOption.update({ price })
+        return deliverOption;
+    }
+
+    const remove = async (name) => {
+        const deliverOption = await find(name);
+        await deliverOption.destroy();
+    }
+
+    return {
+        find,
+        findAll,
+        findAllWhere,
+        create,
+        update,
+        remove
+    }
 }
 
-const update = async (name, price) => {
-    const deliverOption = await find(name);
-    await deliverOption.update({ price })
-    return deliverOption;
-}
-
-const remove = async (name) => {
-    const deliverOption = await find(name);
-    await deliverOption.destroy();
-}
-
-export default {
-    find,
-    findAll,
-    findAllWhere,
-    create,
-    update,
-    remove
-};
+export default DeliverOptionService;

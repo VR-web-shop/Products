@@ -1,4 +1,4 @@
-import ProductOrderStateService from "../../services/ProductOrderStateService";
+import ProductOrderStateService from "../../services/ProductOrderStateService.js";
 
 const typeDef = `
   type Mutation {
@@ -18,6 +18,7 @@ const resolvers = {
         const { name } = input;
         return await ProductOrderStateService.create(name);
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to create product order state');
       }
     },
@@ -26,6 +27,7 @@ const resolvers = {
         await ProductOrderStateService.remove(name);
         return true;
       } catch (error) {
+        console.log('error', error);
         throw new Error('Failed to delete product order state');
       }
     }
