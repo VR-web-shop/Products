@@ -1,4 +1,5 @@
 import Jwt from 'jsonwebtoken';
+import RequestError from '../schemas/RequestError/RequestError.js';
 
 /**
  * @function AuthorizeJWT
@@ -8,23 +9,23 @@ import Jwt from 'jsonwebtoken';
  * @param {NextFunction} next
  * @returns {void}
  */
-const AuthorizeJWT = function(req, res, next) {
+const AuthorizeJWT = function (context) {
+    const { req } = context;
     const header = req.headers['authorization'];
     if (!header) {
-        return res.status(401).send({ message: 'Unauthorized' });
+        throw new RequestError(401, 'Unauthorized');
     }
-    
+
     const token = header && header.split(' ')[1];
     if (!token) {
-        return res.status(401).send({ message: 'No token provided' });
+        throw new RequestError(401, 'Unauthorized');
     }
 
     try {
         const decoded = Jwt.verify(token, process.env.JWT_ACCESS_SECRET);
         req.user = decoded;
-        next();
     } catch (error) {
-        return res.status(401).send({ message: 'Unauthorized' });
+        throw new RequestError(401, 'Unauthorized');
     }
 }
 
@@ -34,32 +35,37 @@ const AuthorizeJWT = function(req, res, next) {
  * @param {string} permissionName
  * @returns {void}
  */
-const AuthorizePermissionJWT = function(permissionName) {
-    return (req, res, next) => {
-        const user = req.user;
-        if (!user) {
-            return res.status(401).send({ message: 'Unauthorized' });
-        }
+const AuthorizePermissionJWT = function (permission) {
+    const user = req.user;
+    if (!user) {
+        throw new RequestError(401, 'Unauthorized');
+    }
 
-        const { permissions } = user;
-        let hasPermission = false;
-        
-        for (const permission of permissions) {
-            if (permission.name === permissionName) {
-                hasPermission = true;
-                break;
-            }
-        }
+    const { permissions } = user;
+    let hasPermission = false;
 
-        if (!hasPermission) {
-            return res.status(403).send({ message: 'Forbidden' });
+    for (const userPermission of permissions) {
+        if (userPermission === permission) {
+            hasPermission = true;
+            break;
         }
+    }
 
-        next();
+    if (!hasPermission) {
+        throw new RequestError(403, 'Forbidden');
+    }
+}
+
+const AuthorizeContextHandler = (context, permission) => {
+    AuthorizeJWT(context)
+
+    if (permission) {
+        AuthorizePermissionJWT(permission)
     }
 }
 
 export default {
     AuthorizeJWT,
-    AuthorizePermissionJWT
+    AuthorizePermissionJWT,
+    AuthorizeContextHandler
 }

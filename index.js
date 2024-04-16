@@ -1,26 +1,41 @@
 import 'dotenv/config'
-import { connect } from './src/config/BrokerConfig.js';
+
+import GraphQLHandler from './src/schemas/base.js'
+import BrokerService from './src/services/BrokerService.js';
+
 import express from 'express';
 import cors from 'cors';
 
-import Controller from './src/controllers/api/v1/Controller.js';
-import SwaggerController from './src/controllers/SwaggerController.js';
-
 (async () => {
-    await connect();
+    /**
+     * Connect to message broker
+     */
+    await BrokerService.connect();
 
+    /**
+     * Create express app
+     */
     const app = express();
+    const port = process.env.SERVER_PORT;
+    const origins = process.env.CORS_ORIGINS.split(',');
 
-    app.use(cors({origin: '*'}));
-
+    /**
+     * Configure express
+     */
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
-    app.use(SwaggerController);
-    Object.values(Controller).forEach(controller => {
-        app.use(controller.router)
-    });
+    origins.forEach(origin => app.use(cors({ origin })));
 
-    app.listen(process.env.SERVER_PORT, () => {
-        console.log(`Server is running on port ${process.env.SERVER_PORT}`);
+    /**
+     * Add GraphQL endpoint
+     */
+    app.get('/graphql', GraphQLHandler);
+    app.post('/graphql', GraphQLHandler);
+
+    /**
+     * Start server
+     */
+    app.listen(port, () => {
+        console.log(`Server is running on http://localhost:${port}`);
     });
 })();
