@@ -35,7 +35,8 @@ const AuthorizeJWT = function (context) {
  * @param {string} permissionName
  * @returns {void}
  */
-const AuthorizePermissionJWT = function (permission) {
+const AuthorizePermissionJWT = function (context, permission) {
+    const { req } = context;
     const user = req.user;
     if (!user) {
         throw new RequestError(401, 'Unauthorized');
@@ -43,9 +44,8 @@ const AuthorizePermissionJWT = function (permission) {
 
     const { permissions } = user;
     let hasPermission = false;
-
     for (const userPermission of permissions) {
-        if (userPermission === permission) {
+        if (userPermission.name === permission) {
             hasPermission = true;
             break;
         }
@@ -60,7 +60,7 @@ const AuthorizeContextHandler = (context, permission) => {
     AuthorizeJWT(context)
 
     if (permission) {
-        AuthorizePermissionJWT(permission)
+        AuthorizePermissionJWT(context, permission)
     }
 }
 

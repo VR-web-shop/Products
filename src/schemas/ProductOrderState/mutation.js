@@ -12,7 +12,7 @@ const resolvers = {
   Mutation: {
     createProductOrderState: async (_, { input }, context) => {
       try {
-        return await Restricted({ context, permission: 'product-order-states:put' }, async () => {
+        return await Restricted({ context, permission: 'product-order-states:create' }, async () => {
           const { name } = input;
           await commandService.invoke(new CreateCommand(name));
           const entity = await queryService.invoke(new ReadOneQuery(name));

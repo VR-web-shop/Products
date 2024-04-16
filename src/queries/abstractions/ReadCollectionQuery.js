@@ -76,7 +76,7 @@ export default class ReadCollectionQuery extends ModelQuery {
                 const hasTombstone = entity[`${tombstoneName}s`] && entity[`${tombstoneName}s`].length > 0;
                 if (hasTombstone) return;
             }
-
+            
             if (snapshotName) {
                 const snapshot = entity[`${snapshotName}s`][0];
                 rows.push(dto(snapshot, entity));

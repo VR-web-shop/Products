@@ -13,6 +13,7 @@ module.exports = {
       { name: 'Credit Card', price: 10.0, payment_option_client_side_uuid: 'aaa-bbb-ccc' },
       { name: 'Paypal', price: 5.0, payment_option_client_side_uuid: 'aaa-bbb-ccc' },
       { name: 'Bank Transfer', price: 15.0, payment_option_client_side_uuid: 'ddd-eee-fff' },
+      { name: 'Cash', price: 0.0, payment_option_client_side_uuid: 'ggg-hhh-iii' }
     ], {});
   },
 

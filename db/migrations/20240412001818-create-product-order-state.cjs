@@ -17,9 +17,13 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        field: 'created_at',
+        field: 'updated_at',
         defaultValue: Sequelize.fn('now')
-      }
+      },
+      deletedAt: {
+        type: Sequelize.DATE,
+        field: 'deleted_at',
+      },
     });
   },
   async down(queryInterface, Sequelize) {

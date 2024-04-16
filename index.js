@@ -2,6 +2,7 @@ import 'dotenv/config'
 
 import GraphQLHandler from './src/schemas/base.js'
 import BrokerService from './src/services/BrokerService.js';
+import FileUploadController from './src/controllers/FileUploadController.js';
 
 import express from 'express';
 import cors from 'cors';
@@ -25,6 +26,11 @@ import cors from 'cors';
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     origins.forEach(origin => app.use(cors({ origin })));
+
+    /**
+     * Add file upload endpoint
+     */
+    app.use(FileUploadController)
 
     /**
      * Add GraphQL endpoint

@@ -38,7 +38,6 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'ProductOrderState',
     paranoid: true,
-    underscored: true
   });
   return ProductOrderState;
 };

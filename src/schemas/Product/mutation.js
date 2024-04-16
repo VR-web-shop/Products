@@ -27,7 +27,7 @@ const resolvers = {
         },
         deleteProduct: async (_, { clientSideUUID }, context) => {
             try {
-                return await Restricted({ context, permission: 'product:delete' }, async () => {
+                return await Restricted({ context, permission: 'products:delete' }, async () => {
                     await commandService.invoke(new DeleteCommand(clientSideUUID));
                     return { __typename: 'BooleanResult', result: true };
                 })
