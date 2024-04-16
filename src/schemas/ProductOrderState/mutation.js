@@ -10,7 +10,7 @@ const queryService = ModelQueryService();
 
 const resolvers = {
   Mutation: {
-    createProductOrderState: async (_, { input }) => {
+    createProductOrderState: async (_, { input }, context) => {
       try {
         return await Restricted({ context, permission: 'product-order-states:put' }, async () => {
           const { name } = input;

@@ -10,13 +10,6 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      /*
-      ProductOrder.belongsTo(models.DeliverOption, { foreignKey: 'deliver_option_name', targetKey: 'client_side_uuid', as: 'DeliverOption' });
-      ProductOrder.belongsTo(models.PaymentOption, { foreignKey: 'payment_option_name', targetKey: 'name', as: 'PaymentOption' });
-      ProductOrder.belongsTo(models.ProductOrderState, { foreignKey: 'product_order_state_name', targetKey: 'name' });
-      ProductOrder.belongsToMany(models.ProductEntity, { through: models.ProductOrderEntity });
-      ProductOrder.hasMany(models.ProductOrderEntity);
-      */
       models.ProductOrder.hasMany(models.ProductOrderDescription, {
         foreignKey: 'product_order_client_side_uuid',
         sourceKey: 'client_side_uuid',
@@ -25,7 +18,12 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'product_order_client_side_uuid',
         sourceKey: 'client_side_uuid',
       });
+      models.ProductOrder.hasMany(models.ProductOrderEntityDescription, {
+        foreignKey: 'product_order_client_side_uuid',
+        sourceKey: 'client_side_uuid',
+      });
 
+      /*
       models.ProductOrder.belongsToMany(models.DeliverOptionDescription, {
         through: models.ProductOrderDescription,
         foreignKey: 'deliver_option_client_side_uuid',
@@ -40,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
         through: models.ProductOrderDescription,
         foreignKey: 'product_order_state_name',
         otherKey: 'product_order_client_side_uuid'
-      });
+      });*/
     }
   }
   ProductOrder.init({

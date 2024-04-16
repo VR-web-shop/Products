@@ -2,13 +2,13 @@ const typeDef = `
     type ProductEntity {
         clientSideUUID: String!
         product_entity_state_name: String!
-        product_uuid: String!
+        product_client_side_uuid: String!
         created_at: String
         updated_at: String
     }
 
     type ProductEntities {
-        rows: [PaymentOption]
+        rows: [ProductEntity]
         pages: Float
         count: Float
     }
@@ -29,7 +29,7 @@ const typeDef = `
     input ProductEntityInput {
         clientSideUUID: String!
         product_entity_state_name: String!
-        product_uuid: String!
+        product_client_side_uuid: String!
     }
 `;
 

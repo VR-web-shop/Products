@@ -25,7 +25,7 @@ const resolvers = {
                 else throw new Error('Failed to put product');
             }
         },
-        deleteProduct: async (_, { clientSideUUID }) => {
+        deleteProduct: async (_, { clientSideUUID }, context) => {
             try {
                 return await Restricted({ context, permission: 'product:delete' }, async () => {
                     await commandService.invoke(new DeleteCommand(clientSideUUID));

@@ -1,8 +1,8 @@
 const typeDef = `
     type ProductOrderEntity {
         clientSideUUID: String!
-        product_order_uuid: String! 
-        product_entity_uuid: String!
+        product_order_client_side_uuid: String! 
+        product_entity_client_side_uuid: String!
         created_at: String
         updated_at: String
     }
@@ -13,7 +13,7 @@ const typeDef = `
         count: Float
     }
     
-    union ProductOrderEntitiesResult = ProductOrderEntity | RequestError
+    union ProductOrderEntitiesResult = ProductOrderEntities | RequestError
     union ProductOrderEntityResult = ProductOrderEntity | RequestError
 
     type Query {
@@ -28,8 +28,8 @@ const typeDef = `
 
     input ProductOrderEntityInput {
         clientSideUUID: String!
-        product_order_uuid: String! 
-        product_entity_uuid: String!
+        product_order_client_side_uuid: String! 
+        product_entity_client_side_uuid: String!
     }
 `;
 

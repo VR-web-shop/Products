@@ -13,7 +13,7 @@ export default function ProductDTO(description, entity) {
         name: description.name,
         description: description.description,
         price: description.price,
-        thumbnailSource: description.thumbnail_source,
+        thumbnail_source: description.thumbnail_source,
         created_at: entity.createdAt,
         updated_at: description.createdAt
     }

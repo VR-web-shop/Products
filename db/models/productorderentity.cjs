@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'product_entity_uuid', 
         targetKey: 'uuid'
       });
+      */
       models.ProductOrderEntity.hasMany(models.ProductOrderEntityDescription, {
         foreignKey: 'product_order_entity_client_side_uuid',
         sourceKey: 'client_side_uuid',
@@ -26,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       models.ProductOrderEntity.hasMany(models.ProductOrderEntityRemoved, {
         foreignKey: 'product_order_entity_client_side_uuid',
         sourceKey: 'client_side_uuid',
-      });*/
+      });
     }
   }
   ProductOrderEntity.init({

@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'product_client_side_uuid',
         sourceKey: 'client_side_uuid',
       });
+      models.Product.hasMany(models.ProductEntityDescription, {
+        foreignKey: 'product_client_side_uuid',
+        sourceKey: 'client_side_uuid',
+      });
     }
   }
   Product.init({

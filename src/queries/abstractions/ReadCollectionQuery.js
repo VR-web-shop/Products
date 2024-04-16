@@ -46,10 +46,10 @@ export default class ReadCollectionQuery extends ModelQuery {
         const offset = (page - 1) * limit;
 
         const where = options.where || {};
-        const count = await db[modelName].count({ where: params.where });
-        const pages = Math.ceil(count / limit);
-
         const params = { limit, offset, where, include: [] };
+
+        const countAll = await db[modelName].count({ where });
+        let countTombstones = 0;
 
         if (snapshotName) {
             params.include.push({
@@ -65,8 +65,10 @@ export default class ReadCollectionQuery extends ModelQuery {
                 order: [["created_at", "DESC"]],
                 limit: 1
             });
-        }
 
+            countTombstones = await db[tombstoneName].count({ where });
+        }
+        
         const entities = await db[modelName].findAll(params);
         const rows = [];
         entities.forEach(entity => {
@@ -82,6 +84,9 @@ export default class ReadCollectionQuery extends ModelQuery {
                 rows.push(dto(entity));
             }
         });
+
+        const count = countAll - countTombstones;
+        const pages = Math.ceil(count / limit);
 
         return { rows, pages, count };
     }

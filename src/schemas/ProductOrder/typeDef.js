@@ -7,8 +7,8 @@ const typeDef = `
         city: String!
         country: String!
         postal_code: String!
-        deliver_option_name: String!
-        payment_option_name: String!
+        deliver_option_client_side_uuid: String!
+        payment_option_client_side_uuid: String!
         product_order_state_name: String!
         created_at: String
         updated_at: String
@@ -41,8 +41,8 @@ const typeDef = `
         city: String!
         country: String!
         postal_code: String!
-        deliver_option_name: String!
-        payment_option_name: String!
+        deliver_option_client_side_uuid: String!
+        payment_option_client_side_uuid: String!
         product_order_state_name: String!
     }
 `;

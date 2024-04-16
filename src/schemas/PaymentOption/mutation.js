@@ -25,7 +25,7 @@ const resolvers = {
                 else throw new Error('Failed to put payment options');
             }
         },
-        deletePaymentOption: async (_, { clientSideUUID }) => {
+        deletePaymentOption: async (_, { clientSideUUID }, context) => {
             try {
                 return await Restricted({ context, permission: 'payment-options:delete' }, async () => {
                     await commandService.invoke(new DeleteCommand(clientSideUUID));

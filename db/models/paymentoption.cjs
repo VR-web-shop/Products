@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'payment_option_client_side_uuid',
         sourceKey: 'client_side_uuid',
       });
+      models.PaymentOption.hasMany(models.ProductOrderDescription, {
+        foreignKey: 'payment_option_client_side_uuid',
+        sourceKey: 'client_side_uuid',
+      });
     }
   }
   PaymentOption.init({

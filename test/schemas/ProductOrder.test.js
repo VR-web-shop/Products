@@ -2,24 +2,45 @@ import { expect, test, beforeAll } from 'vitest'
 import EasyGraphQLTester from 'easygraphql-tester';
 import mutation from '../../src/schemas/ProductOrder/mutation.js';
 import query from '../../src/schemas/ProductOrder/query.js';
+import typeDef from '../../src/schemas/ProductOrder/typeDef.js';
 import db from '../../db/models/index.cjs';
 import productorder from '../../db/models/productorder.cjs';
+import productorderdescription from '../../db/models/productorderdescription.cjs';
+import productorderremoved from '../../db/models/productorderremoved.cjs';
 import productorderstate from '../../db/models/productorderstate.cjs';
 import deliveroption from '../../db/models/deliveroption.cjs';
+import deliveroptiondescription from '../../db/models/deliveroptiondescription.cjs';
 import paymentoption from '../../db/models/paymentoption.cjs';
+import paymentoptiondescription from '../../db/models/paymentoptiondescription.cjs';
+import requestErrorTypeDef from '../../src/schemas/RequestError/typeDef.js';
 
 let tester;
 beforeAll(async () => {
+  const yesterday = new Date().setDate(new Date().getDate() - 1);
+  const twoDaysAgo = new Date().setDate(new Date().getDate() - 2);
+
   const DeliverOptionModel = deliveroption(db.sequelize, db.Sequelize.DataTypes);
   await DeliverOptionModel.sync({ force: true });
   await DeliverOptionModel.bulkCreate([
-    { name: 'Home Delivery', price: 10 },
+    { client_side_uuid: 'aaa-aaa-aaa' },
+  ]);
+
+  const DeliverOptionDescriptionModel = deliveroptiondescription(db.sequelize, db.Sequelize.DataTypes);
+  await DeliverOptionDescriptionModel.sync({ force: true });
+  await DeliverOptionDescriptionModel.bulkCreate([
+    { deliver_option_client_side_uuid: 'aaa-aaa-aaa', name: 'Home Delivery', price: 10 },
   ]);
 
   const PaymentOptionModel = paymentoption(db.sequelize, db.Sequelize.DataTypes);
   await PaymentOptionModel.sync({ force: true });
   await PaymentOptionModel.bulkCreate([
-    { name: 'Credit Card', price: 10 },
+    { client_side_uuid: 'aaa-aaa-aaa' },
+  ]);
+
+  const PaymentOptionDescriptionModel = paymentoptiondescription(db.sequelize, db.Sequelize.DataTypes);
+  await PaymentOptionDescriptionModel.sync({ force: true });
+  await PaymentOptionDescriptionModel.bulkCreate([
+    { payment_option_client_side_uuid: 'aaa-aaa-aaa', name: 'Credit Card', price: 10 },
   ]);
 
   const ProductOrderStateModel = productorderstate(db.sequelize, db.Sequelize.DataTypes);
@@ -32,108 +53,274 @@ beforeAll(async () => {
   const Model = productorder(db.sequelize, db.Sequelize.DataTypes);
   await Model.sync({ force: true });
   await Model.bulkCreate([
-    { 
-        uuid: 'ddd-ddd-ddd-ddd',
-        name: 'John Doe',
-        email: 'example@test.com',
-        address: '123 Main St',
-        city: 'New York',
-        country: 'USA',
-        postal_code: '12345',
-        deliver_option_name: 'Home Delivery',
-        payment_option_name: 'Credit Card',
-        product_order_state_name: 'Pending'
+    { client_side_uuid: 'ddd-ddd-ddd-ddd' },
+    { client_side_uuid: 'eee-eee-eee-eee' },
+  ]);
+
+  const ProductOrderDescriptionModel = productorderdescription(db.sequelize, db.Sequelize.DataTypes);
+  await ProductOrderDescriptionModel.sync({ force: true });
+  await ProductOrderDescriptionModel.bulkCreate([
+    {
+      product_order_client_side_uuid: 'ddd-ddd-ddd-ddd',
+      name: 'John Doe',
+      email: 'example@test.com',
+      address: '123 Main St',
+      city: 'New York',
+      country: 'USA',
+      postal_code: '12345',
+      deliver_option_client_side_uuid: 'aaa-aaa-aaa',
+      payment_option_client_side_uuid: 'aaa-aaa-aaa',
+      product_order_state_name: 'Pending',
+      createdAt: twoDaysAgo
     },
-    { 
-        uuid: 'eee-eee-eee-eee',
-        name: 'Jane Doe',
-        email: 'example@test.com',
-        address: '123 Main St',
-        city: 'New York',
-        country: 'USA',
-        postal_code: '12345',
-        deliver_option_name: 'Home Delivery',
-        payment_option_name: 'Credit Card',
-        product_order_state_name: 'Pending'
-    },
+    {
+      product_order_client_side_uuid: 'ddd-ddd-ddd-ddd',
+      name: 'Jane Doe',
+      email: 'example2@test.com',
+      address: '123 Main St2',
+      city: 'New York2',
+      country: 'USA2',
+      postal_code: '123452',
+      deliver_option_client_side_uuid: 'aaa-aaa-aaa',
+      payment_option_client_side_uuid: 'aaa-aaa-aaa',
+      product_order_state_name: 'Delivered',
+      createdAt: yesterday
+    }
+  ]);
+
+  const ProductOrderRemovedModel = productorderremoved(db.sequelize, db.Sequelize.DataTypes);
+  await ProductOrderRemovedModel.sync({ force: true });
+  await ProductOrderRemovedModel.bulkCreate([
+    { product_order_client_side_uuid: 'eee-eee-eee-eee', deletedAt: new Date() },
   ]);
 
   const typeDefs = `
-    ${query.typeDef}
-    ${mutation.typeDef}
+    ${typeDef}
+    ${requestErrorTypeDef}
   `;
 
   tester = new EasyGraphQLTester(typeDefs, {
-    ...query.resolvers,
-    ...mutation.resolvers,
+    ...query,
+    ...mutation,
   });
-  return tester;
 });
 
-test('productOrders queries fetches all product orders', async () => { 
-  const { data } = await tester.graphql('{ productOrders(offset: 0, limit: 10) { uuid } }');
-  expect(data.productOrders.length).toBe(2);
-});
-
-test('productOrder queries fetches a specific product order by uuid', async () => {
-  const { data } = await tester.graphql('{ productOrder(uuid: "ddd-ddd-ddd-ddd") { uuid } }');
-  expect(data.productOrder.uuid).toBe('ddd-ddd-ddd-ddd');
-});
-
-test('createProductOrder mutation creates a product order', async () => {
-  const { data } = await tester.graphql(`mutation {
-    createProductOrder(input: { name: "John Doe", email: "test@example.com", address: "123 Main St", city: "New York", country: "USA", postal_code: "12345", deliver_option_name: "Home Delivery", payment_option_name: "Credit Card", product_order_state_name: "Pending" }) {
+test('productOrders queries fetches all product orders', async () => {
+  const { data } = await tester.graphql(`{ productOrders(page: 1, limit: 10) { 
+    __typename
+    ... on ProductOrders {
+      rows {
+        clientSideUUID
         name
         email
         address
         city
         country
         postal_code
-        deliver_option_name
-        payment_option_name
+        deliver_option_client_side_uuid
+        payment_option_client_side_uuid
         product_order_state_name
+        created_at
+        updated_at
+      }
+      pages 
+      count
     }
-  }`);
-  expect(data.createProductOrder.name).toBe('John Doe');
-  expect(data.createProductOrder.email).toBe('test@example.com');
-  expect(data.createProductOrder.address).toBe('123 Main St');
-  expect(data.createProductOrder.city).toBe('New York');
-  expect(data.createProductOrder.country).toBe('USA');
-  expect(data.createProductOrder.postal_code).toBe('12345');
-  expect(data.createProductOrder.deliver_option_name).toBe('Home Delivery');
-  expect(data.createProductOrder.payment_option_name).toBe('Credit Card');
-  expect(data.createProductOrder.product_order_state_name).toBe('Pending');
+    ... on RequestError {
+      code
+      message
+    }
+  }}`);
+  expect(data.productOrders.rows.length).toBe(1);
+  expect(data.productOrders.rows[0].clientSideUUID).toBe('ddd-ddd-ddd-ddd');
+  expect(data.productOrders.rows[0].name).toBe('Jane Doe');
+  expect(data.productOrders.rows[0].email).toBe('example2@test.com');
+  expect(data.productOrders.rows[0].address).toBe('123 Main St2');
+  expect(data.productOrders.rows[0].city).toBe('New York2');
+  expect(data.productOrders.rows[0].country).toBe('USA2');
+  expect(data.productOrders.rows[0].postal_code).toBe('123452');
+  expect(data.productOrders.rows[0].deliver_option_client_side_uuid).toBe('aaa-aaa-aaa');
+  expect(data.productOrders.rows[0].payment_option_client_side_uuid).toBe('aaa-aaa-aaa');
+  expect(data.productOrders.rows[0].product_order_state_name).toBe('Delivered');
+  expect(data.productOrders.rows[0].created_at).not.toBe(null);
+  expect(data.productOrders.rows[0].updated_at).not.toBe(null);
+  expect(data.productOrders.pages).toBe(1);
+  expect(data.productOrders.count).toBe(1);
 });
 
-test('updateProductOrder mutation updates a product order', async () => {
+test('productOrder queries fetches a specific product order by clientSideUUID', async () => {
+  const { data } = await tester.graphql(`{ productOrder(clientSideUUID: "ddd-ddd-ddd-ddd") { 
+    __typename
+    ... on ProductOrder {
+      clientSideUUID
+      name
+      email
+      address
+      city
+      country
+      postal_code
+      deliver_option_client_side_uuid
+      payment_option_client_side_uuid
+      product_order_state_name
+      created_at
+      updated_at
+    }
+    ... on RequestError {
+      code
+      message
+    }
+  }}`);
+  expect(data.productOrder.clientSideUUID).toBe('ddd-ddd-ddd-ddd');
+  expect(data.productOrder.name).toBe('Jane Doe');
+  expect(data.productOrder.email).toBe('example2@test.com');
+  expect(data.productOrder.address).toBe('123 Main St2');
+  expect(data.productOrder.city).toBe('New York2');
+  expect(data.productOrder.country).toBe('USA2');
+  expect(data.productOrder.postal_code).toBe('123452');
+  expect(data.productOrder.deliver_option_client_side_uuid).toBe('aaa-aaa-aaa');
+  expect(data.productOrder.payment_option_client_side_uuid).toBe('aaa-aaa-aaa');
+  expect(data.productOrder.product_order_state_name).toBe('Delivered');
+  expect(data.productOrder.created_at).not.toBe(null);
+  expect(data.productOrder.updated_at).not.toBe(null);
+});
+
+test('productOrder queries fetches fails if a specific product order by clientSideUUID does not exist', async () => {
+  const { data } = await tester.graphql(`{ productOrder(clientSideUUID: "hello-world") { 
+    __typename
+    ... on ProductOrder {
+      clientSideUUID
+      name
+      email
+      address
+      city
+      country
+      postal_code
+      deliver_option_client_side_uuid
+      payment_option_client_side_uuid
+      product_order_state_name
+      created_at
+      updated_at
+    }
+    ... on RequestError {
+      code
+      message
+    }
+  }}`);
+  expect(data.productOrder.code).toBe("404");
+  expect(data.productOrder.message).toBe('No Entity found');
+});
+
+test('putProductOrder mutation creates a product order', async () => {
   const { data } = await tester.graphql(`mutation {
-    updateProductOrder(input: { uuid: "eee-eee-eee-eee", name: "Jane Doe", email: "test@example.com2", address: "123 Main St2", city: "New York2", country: "USA2", postal_code: "123452", deliver_option_name: "Home Delivery", payment_option_name: "Credit Card", product_order_state_name: "Delivered" }) {
+    putProductOrder(input: { clientSideUUID: "ggg-ggg-ggg", name: "John Doe", email: "test@example.com", address: "123 Main St", city: "New York", country: "USA", postal_code: "12345", deliver_option_client_side_uuid: "aaa-aaa-aaa", payment_option_client_side_uuid: "aaa-aaa-aaa", product_order_state_name: "Pending" }) {
+      __typename
+      ... on ProductOrder {
+        clientSideUUID
         name
         email
         address
         city
         country
         postal_code
-        deliver_option_name
-        payment_option_name
+        deliver_option_client_side_uuid
+        payment_option_client_side_uuid
         product_order_state_name
+        created_at
+        updated_at
+      }
+      ... on RequestError {
+        code
+        message
+      }
+    }}`);
+  expect(data.putProductOrder.clientSideUUID).toBe('ggg-ggg-ggg');
+  expect(data.putProductOrder.name).toBe('John Doe');
+  expect(data.putProductOrder.email).toBe('test@example.com');
+  expect(data.putProductOrder.address).toBe('123 Main St');
+  expect(data.putProductOrder.city).toBe('New York');
+  expect(data.putProductOrder.country).toBe('USA');
+  expect(data.putProductOrder.postal_code).toBe('12345');
+  expect(data.putProductOrder.deliver_option_client_side_uuid).toBe('aaa-aaa-aaa');
+  expect(data.putProductOrder.payment_option_client_side_uuid).toBe('aaa-aaa-aaa');
+  expect(data.putProductOrder.product_order_state_name).toBe('Pending');
+});
+
+test('putProductOrder mutation updates a product order', async () => {
+  const { data } = await tester.graphql(`mutation {
+    putProductOrder(input: { clientSideUUID: "ggg-ggg-ggg", name: "test", email: "test@test.com2", address: "test", city: "test", country: "test", postal_code: "333", deliver_option_client_side_uuid: "aaa-aaa-aaa", payment_option_client_side_uuid: "aaa-aaa-aaa", product_order_state_name: "Delivered" }) {
+      __typename
+      ... on ProductOrder {
+        clientSideUUID
+        name
+        email
+        address
+        city
+        country
+        postal_code
+        deliver_option_client_side_uuid
+        payment_option_client_side_uuid
+        product_order_state_name
+        created_at
+        updated_at
+      }
+      ... on RequestError {
+        code
+        message
+      }
+  }}`);
+  expect(data.putProductOrder.clientSideUUID).toBe('ggg-ggg-ggg');
+  expect(data.putProductOrder.name).toBe('test');
+  expect(data.putProductOrder.email).toBe('test@test.com2');
+  expect(data.putProductOrder.address).toBe('test');
+  expect(data.putProductOrder.city).toBe('test');
+  expect(data.putProductOrder.country).toBe('test');
+  expect(data.putProductOrder.postal_code).toBe('333');
+  expect(data.putProductOrder.deliver_option_client_side_uuid).toBe('aaa-aaa-aaa');
+  expect(data.putProductOrder.payment_option_client_side_uuid).toBe('aaa-aaa-aaa');
+  expect(data.putProductOrder.product_order_state_name).toBe('Delivered');
+});
+
+test('There should only be two entities because put is idempotence', async () => {
+  const { data } = await tester.graphql(`{ productOrders(page: 1, limit: 10) { 
+    __typename
+    ... on ProductOrders {
+      rows {
+        clientSideUUID
+        name
+        email
+        address
+        city
+        country
+        postal_code
+        deliver_option_client_side_uuid
+        payment_option_client_side_uuid
+        product_order_state_name
+        created_at
+        updated_at
+      }
+      pages 
+      count
     }
-  }`);
-  expect(data.updateProductOrder.name).toBe('Jane Doe');
-  expect(data.updateProductOrder.email).toBe('test@example.com2');
-  expect(data.updateProductOrder.address).toBe('123 Main St2');
-  expect(data.updateProductOrder.city).toBe('New York2');
-  expect(data.updateProductOrder.country).toBe('USA2');
-  expect(data.updateProductOrder.postal_code).toBe('123452');
-  expect(data.updateProductOrder.deliver_option_name).toBe('Home Delivery');
-  expect(data.updateProductOrder.payment_option_name).toBe('Credit Card');
-  expect(data.updateProductOrder.product_order_state_name).toBe('Delivered');
+    ... on RequestError {
+      code
+      message
+    }
+  }}`);
+  expect(data.productOrders.rows.length).toBe(2);
 });
 
 test('deleteProductOrder mutation deletes a product order', async () => {
   const { data } = await tester.graphql(`mutation {
-    deleteProductOrder(uuid: "ddd-ddd-ddd-ddd")
-  }`);
-  expect(data.deleteProductOrder).toBe(true);
+    deleteProductOrder(clientSideUUID: "ggg-ggg-ggg") {
+      __typename
+      ... on BooleanResult {
+        result
+      }
+      ... on RequestError {
+        code
+        message
+      }
+  }}`); 
+  expect(data.deleteProductOrder.result).toBe(true);
 });
 

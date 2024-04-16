@@ -10,16 +10,16 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      models.ProductEntityDescription.belongsTo(models.Product, {
-        foreignKey: 'product_client_side_uuid',
+      models.ProductEntityDescription.belongsTo(models.ProductEntity, {
+        foreignKey: 'product_entity_client_side_uuid',
         targetKey: 'client_side_uuid'
       });
       models.ProductEntityDescription.belongsTo(models.ProductEntityState, {
         foreignKey: 'product_entity_state_name',
         targetKey: 'name'
       });
-      models.ProductEntityDescription.belongsTo(models.ProductEntity, { 
-        foreignKey: 'product_entity_client_side_uuid', 
+      models.ProductEntityDescription.belongsTo(models.Product, {
+        foreignKey: 'product_client_side_uuid',
         targetKey: 'client_side_uuid'
       });
     }

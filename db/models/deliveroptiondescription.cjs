@@ -14,12 +14,6 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'deliver_option_client_side_uuid',
         targetKey: 'client_side_uuid'
       });
-      models.DeliverOptionDescription.hasMany(models.ProductOrderDescription);
-      models.DeliverOptionDescription.belongsToMany(models.ProductOrder, {
-        through: models.ProductOrderDescription,
-        foreignKey: 'product_order_client_side_uuid',
-        otherKey: 'client_side_uuid'
-      });
     }
   }
   DeliverOptionDescription.init({

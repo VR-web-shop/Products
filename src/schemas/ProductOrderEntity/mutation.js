@@ -14,8 +14,8 @@ const resolvers = {
     putProductOrderEntity: async (_, { input }, context) => {
 		try {
 			return await Restricted({ context, permission: 'product-order-entities:put' }, async () => {
-				const { clientSideUUID, product_order_uuid, product_entity_uuid } = input;
-				await commandService.invoke(new PutCommand(clientSideUUID, { product_order_uuid, product_entity_uuid }));
+				const { clientSideUUID, product_order_client_side_uuid, product_entity_client_side_uuid } = input;
+				await commandService.invoke(new PutCommand(clientSideUUID, { product_order_client_side_uuid, product_entity_client_side_uuid }));
 				const entity = await queryService.invoke(new ReadOneQuery(clientSideUUID));
 				return { __typename: 'ProductOrderEntity', ...entity };
 			})
@@ -25,7 +25,7 @@ const resolvers = {
 			else throw new Error('Failed to put product order entity');
 		}
 	},
-	deleteProductOrderEntity: async (_, { clientSideUUID }) => {
+	deleteProductOrderEntity: async (_, { clientSideUUID }, context) => {
 		try {
 			return await Restricted({ context, permission: 'product-order-entities:delete' }, async () => {
 				await commandService.invoke(new DeleteCommand(clientSideUUID));

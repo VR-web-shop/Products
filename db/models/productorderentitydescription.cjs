@@ -10,19 +10,19 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      models.ProductOrderEntityDescription.belongsTo(models.ProductOrderDescription, { 
+      models.ProductOrderEntityDescription.belongsTo(models.ProductOrder, { 
         foreignKey: 'product_order_client_side_uuid', 
         targetKey: 'client_side_uuid'
       });
-      models.ProductOrderEntityDescription.belongsTo(models.ProductEntityDescription, { 
+      models.ProductOrderEntityDescription.belongsTo(models.ProductEntity, { 
         foreignKey: 'product_entity_client_side_uuid', 
         targetKey: 'client_side_uuid'
       });
-      models.ProductOrderEntityDescription.belongsTo(models.ProductOrderEntityDescription, { 
+      models.ProductOrderEntityDescription.belongsTo(models.ProductOrderEntity, { 
         foreignKey: 'product_order_entity_client_side_uuid', 
         targetKey: 'client_side_uuid'
       });
-
+      /*
       models.ProductOrderEntityDescription.belongsToMany(models.ProductOrder, {
         through: models.ProductOrderDescription,
         foreignKey: 'product_order_client_side_uuid',
@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
         through: models.ProductOrderEntityDescription,
         foreignKey: 'product_order_entity_client_side_uuid',
         otherKey: 'client_side_uuid'
-      });
+      });*/
     }
   }
   ProductOrderEntityDescription.init({

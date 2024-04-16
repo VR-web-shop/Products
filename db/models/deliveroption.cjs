@@ -10,12 +10,15 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      //models.DeliverOption.hasMany(models.ProductOrder);
       models.DeliverOption.hasMany(models.DeliverOptionDescription, {
         foreignKey: 'deliver_option_client_side_uuid',
         sourceKey: 'client_side_uuid',
       });
       models.DeliverOption.hasMany(models.DeliverOptionRemoved, {
+        foreignKey: 'deliver_option_client_side_uuid',
+        sourceKey: 'client_side_uuid',
+      });
+      models.DeliverOption.hasMany(models.ProductOrderDescription, {
         foreignKey: 'deliver_option_client_side_uuid',
         sourceKey: 'client_side_uuid',
       });
