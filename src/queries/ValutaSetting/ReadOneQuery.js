@@ -2,14 +2,16 @@ import _ReadOneQuery from "../abstractions/ReadOneQuery.js";
 import ValutaSettingDTO from "../../dtos/ValutaSetting.js";
 
 export default class ReadOneQuery extends _ReadOneQuery {
-    constructor(clientSideUUID) {
+    constructor(clientSideUUID, additionalParams = {}) {
         super(
             clientSideUUID, 
             "client_side_uuid",
             ValutaSettingDTO, 
-            "ValutaSetting", 
+            "ValutaSettings", 
             "ValutaSettingDescription", 
-            "ValutaSettingRemoved"
+            "ValutaSettingRemoved",
+            "valuta_setting_client_side_uuid",
+            additionalParams
         );
     }
 }

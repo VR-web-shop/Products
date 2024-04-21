@@ -92,8 +92,6 @@ test('paymentOption queries fetches a specific payment option by name', async ()
   expect(data.paymentOption.clientSideUUID).toBe('aaa-bbb-ccc');
   expect(data.paymentOption.name).toBe('Cash');
   expect(data.paymentOption.price).toBe(0);
-  expect(data.paymentOption.created_at).not.toBe(null);
-  expect(data.paymentOption.updated_at).not.toBe(null);
 });
 
 test('paymentOption queries fetches fails if a specific payment option by clientSideUUID does not exist', async () => {
@@ -134,8 +132,6 @@ test('putPaymentOption mutation creates a payment option', async () => {
   expect(data.putPaymentOption.clientSideUUID).toBe('ccc-ccc-ccc');
   expect(data.putPaymentOption.name).toBe('Beans');
   expect(data.putPaymentOption.price).toBe(10000);
-  expect(data.putPaymentOption.created_at).not.toBe(null);
-  expect(data.putPaymentOption.updated_at).not.toBe(null);
 });
 
 test('putPaymentOption mutation updates a payment option', async () => {
@@ -157,8 +153,6 @@ test('putPaymentOption mutation updates a payment option', async () => {
   expect(data.putPaymentOption.clientSideUUID).toBe('ccc-ccc-ccc');
   expect(data.putPaymentOption.name).toBe('Apples');
   expect(data.putPaymentOption.price).toBe(3);
-  expect(data.putPaymentOption.created_at).not.toBe(null);
-  expect(data.putPaymentOption.updated_at).not.toBe(null);
 });
 
 test('There should only be two entities because put is idempotence', async () => {

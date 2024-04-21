@@ -2,11 +2,16 @@ import _ReadCollectionQuery from "../abstractions/ReadCollectionQuery.js";
 import ProductOrderStateDTO from "../../dtos/ProductOrderState.js";
 
 export default class ReadCollectionQuery extends _ReadCollectionQuery {
-    constructor(options={}) {
+    constructor(options={}, snapshotOptions={}) {
         super(
             options, 
             ProductOrderStateDTO, 
-            "ProductOrderState"
+            "ProductOrderStates",
+            null,
+            null,
+            snapshotOptions,
+            null,
+            "name",
         );
     }
 }

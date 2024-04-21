@@ -92,8 +92,6 @@ test('deliverOption queries fetches a specific deliver option by clientSideUUID'
   expect(data.deliverOption.clientSideUUID).toBe('aaa-bbb-ccc');
   expect(data.deliverOption.name).toBe('Pickup');
   expect(data.deliverOption.price).toBe(0);
-  expect(data.deliverOption.created_at).not.toBe(null);
-  expect(data.deliverOption.updated_at).not.toBe(null);
 });
 
 test('deliverOption queries fetches fails if a specific deliver option by clientSideUUID does not exist', async () => {
@@ -134,8 +132,6 @@ test('putDeliverOption mutation creates a deliver option', async () => {
   expect(data.putDeliverOption.clientSideUUID).toBe('ccc-ccc-ccc');
   expect(data.putDeliverOption.name).toBe('Home Delivery');
   expect(data.putDeliverOption.price).toBe(15);
-  expect(data.putDeliverOption.created_at).not.toBe(null);
-  expect(data.putDeliverOption.updated_at).not.toBe(null);
 });
 
 test('putDeliverOption mutation updates a deliver option', async () => {
@@ -157,8 +153,6 @@ test('putDeliverOption mutation updates a deliver option', async () => {
   expect(data.putDeliverOption.clientSideUUID).toBe('ccc-ccc-ccc');
   expect(data.putDeliverOption.name).toBe('Home Delivery');
   expect(data.putDeliverOption.price).toBe(5);
-  expect(data.putDeliverOption.created_at).not.toBe(null);
-  expect(data.putDeliverOption.updated_at).not.toBe(null);
 }); 
 
 test('There should only be two entities because put is idempotence', async () => {

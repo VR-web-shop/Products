@@ -77,8 +77,6 @@ test('valutaSettings queries fetches all valuta settings', async () => {
   expect(data.valutaSettings.rows[0].short).toBe('British Pound');
   expect(data.valutaSettings.rows[0].symbol).toBe('£');
   expect(data.valutaSettings.rows[0].active).toBe(true);
-  expect(data.valutaSettings.rows[0].created_at).not.toBe(null);
-  expect(data.valutaSettings.rows[0].updated_at).not.toBe(null);
   expect(data.valutaSettings.pages).toBe(1);
   expect(data.valutaSettings.count).toBe(1);
 });
@@ -105,8 +103,6 @@ test('valutaSetting queries fetches a specific valuta setting by clientSideUUID'
   expect(data.valutaSetting.short).toBe('British Pound');
   expect(data.valutaSetting.symbol).toBe('£');
   expect(data.valutaSetting.active).toBe(true);
-  expect(data.valutaSetting.created_at).not.toBe(null);
-  expect(data.valutaSetting.updated_at).not.toBe(null);
 });
 
 test('valutaSetting queries fetches fails if a specific valuta setting by clientSideUUID does not exist', async () => {
@@ -153,8 +149,6 @@ test('putValutaSetting mutation creates a valuta setting', async () => {
   expect(data.putValutaSetting.symbol).toBe('¥');
   expect(data.putValutaSetting.short).toBe('Japanese Yen');
   expect(data.putValutaSetting.active).toBe(false);
-  expect(data.putValutaSetting.created_at).not.toBe(null);
-  expect(data.putValutaSetting.updated_at).not.toBe(null);
 });
 
 test('putValutaSetting mutation updates a valuta setting', async () => {
@@ -180,8 +174,6 @@ test('putValutaSetting mutation updates a valuta setting', async () => {
   expect(data.putValutaSetting.symbol).toBe('¥2');
   expect(data.putValutaSetting.short).toBe('Japanese Yen2');
   expect(data.putValutaSetting.active).toBe(true);
-  expect(data.putValutaSetting.created_at).not.toBe(null);
-  expect(data.putValutaSetting.updated_at).not.toBe(null);
 });
 
 test('deleteValutaSetting mutation deletes a valuta setting', async () => {

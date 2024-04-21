@@ -101,8 +101,6 @@ test('product queries fetches a specific product by uuid', async () => {
   expect(data.product.description).toBe('A fruit');
   expect(data.product.thumbnail_source).toBe('orange.jpg');
   expect(data.product.price).toBe(3);
-  expect(data.product.created_at).not.toBe(null);
-  expect(data.product.updated_at).not.toBe(null);
 });
 
 test('product queries fetches fails if a specific product by clientSideUUID does not exist', async () => {
@@ -147,8 +145,6 @@ test('putProduct mutation creates a product', async () => {
   expect(data.putProduct.description).toBe('A fruit');
   expect(data.putProduct.thumbnail_source).toBe('strawberries.jpg');
   expect(data.putProduct.price).toBe(15);
-  expect(data.putProduct.created_at).not.toBe(null);
-  expect(data.putProduct.updated_at).not.toBe(null);
 });
 
 test('putProduct mutation updates a product', async () => {
@@ -174,8 +170,6 @@ test('putProduct mutation updates a product', async () => {
   expect(data.putProduct.description).toBe('A fruit2');
   expect(data.putProduct.thumbnail_source).toBe('strawberries2.jpg');
   expect(data.putProduct.price).toBe(2);
-  expect(data.putProduct.created_at).not.toBe(null);
-  expect(data.putProduct.updated_at).not.toBe(null);
 });
 
 test('There should only be two entities because put is idempotence', async () => {

@@ -1,9 +1,20 @@
 import ModelQuery from "./ModelQuery.js";
 import RequestError from "../../schemas/RequestError/RequestError.js";
+import { Op, QueryTypes } from "sequelize";
 
 export default class ReadOneQuery extends ModelQuery {
-    constructor(pk, pkName, dto, modelName, snapshotName = null, tombstoneName = null) {
+    constructor(
+        pk, 
+        pkName, 
+        dto, 
+        tableName, 
+        snapshotName = null, 
+        tombstoneName = null,
+        fkName = null,
+        additionalParams = {}
+    ) {
         super();
+
         if (!pk || typeof pk !== "string") {
             throw new Error("pk is required and must be a string");
         }
@@ -16,24 +27,34 @@ export default class ReadOneQuery extends ModelQuery {
             throw new Error("dto is required and must be a function");
         }
 
-        if (!modelName || typeof modelName !== "string") {
-            throw new Error("modelName is required and must be a string");
+        if (!tableName || typeof tableName !== "string") {
+            throw new Error("tableName is required and must be a string");
         }
 
         if (snapshotName && typeof snapshotName !== "string") {
-            throw new Error("if using snapshots, snapshotName is required and must be a string");
+            throw new Error("if using snapshots, snapshotName must be a string");
         }
 
         if (tombstoneName && typeof tombstoneName !== "string") {
-            throw new Error("if using tombstones, tombstoneName is required and must be a string");
+            throw new Error("if using tombstones, tombstoneName must be a string");
+        }
+
+        if (tombstoneName && !fkName) {
+            throw new Error("if using tombstones, fkName is required");
+        }
+
+        if (additionalParams && typeof additionalParams !== "object") {
+            throw new Error("additionalParams must be an object");
         }
 
         this.pk = pk;
         this.pkName = pkName;
         this.dto = dto;
-        this.modelName = modelName;
+        this.tableName = tableName;
         this.snapshotName = snapshotName;
         this.tombstoneName = tombstoneName;
+        this.fkName = fkName;
+        this.additionalParams = additionalParams;
     }
 
     async execute(db) {
@@ -41,48 +62,48 @@ export default class ReadOneQuery extends ModelQuery {
             throw new Error("db is required and must be an object");
         }
 
-        const pk = this.pk;
+        const mTable = this.tableName;
+        const sTable = this.snapshotName ? `${this.snapshotName}s` : null;
+        const tTable = this.tombstoneName ? `${this.tombstoneName}s` : null;
+        const fkName = this.fkName;
         const pkName = this.pkName;
-        const dto = this.dto;
-        const modelName = this.modelName;
-        const snapshotName = this.snapshotName;
-        const tombstoneName = this.tombstoneName;
-        const params = { where: { [pkName]: pk }, include: [] };
+        const limit = 1;
+        const where = [{ 
+            table: mTable, 
+            column: pkName, 
+            operator: Op.eq, 
+            key: 'pk'
+        }]
 
-        if (snapshotName) {
-            params.include.push({
-                model: db[snapshotName],
-                order: [["created_at", "DESC"]],
-                limit: 1
+        const queryOptions = {
+            mTable,
+            sTable, 
+            tTable, 
+            fkName, 
+            pkName, 
+            limit,
+            where
+        }
+
+        if (this.additionalParams.where) {
+            this.additionalParams.where.forEach(w => {
+                replacements[w.table] = w.table;
+                replacements[w.column] = w.column;
+                replacements[w.key] = w.value;
+                queryOptions.where.push(w);
             });
         }
 
-        if (tombstoneName) {
-            params.include.push({
-                model: db[tombstoneName],
-                order: [["created_at", "DESC"]],
-                limit: 1
-            });
-        }
+        const replacements = { pk: this.pk, limit: 1 };
+        const selectSQL = ModelQuery.getSql({ prefix: "SELECT *", ...queryOptions });
+        const selectOpt = { type: QueryTypes.SELECT, replacements }
 
-        const entity = await db[modelName].findOne(params);
+        const entity = await db.sequelize.query(selectSQL, selectOpt);
 
-        if (!entity) {
+        if (entity.length === 0) {
             throw new RequestError(404, "No Entity found");
         }
 
-        if (tombstoneName) {
-            const hasTombstone = entity[`${tombstoneName}s`] && entity[`${tombstoneName}s`].length > 0;
-            if (hasTombstone) {
-                throw new RequestError(404, "No Entity found");
-            }
-        }
-
-        if (snapshotName) {
-            const snapshot = entity[`${snapshotName}s`][0];
-            return dto(snapshot, entity);
-        } else {
-            return dto(entity);
-        }
+        return this.dto(entity[0]);
     }
 }

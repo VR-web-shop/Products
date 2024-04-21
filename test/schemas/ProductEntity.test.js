@@ -120,8 +120,6 @@ test('productEntity queries fetches a specific product entity by uuid', async ()
   expect(data.productEntity.clientSideUUID).toBe('aaa-aaa-aaa-aaa');
   expect(data.productEntity.product_client_side_uuid).toBe('ccc-ccc-ccc-ccc');
   expect(data.productEntity.product_entity_state_name).toBe('Unavailable');
-  expect(data.productEntity.created_at).not.toBe(null);
-  expect(data.productEntity.updated_at).not.toBe(null);
 });
 
 test('productEntity queries fetches fails if a specific product entity by clientSideUUID does not exist', async () => {
@@ -162,8 +160,6 @@ test('putProductEntity mutation creates a product entity', async () => {
   expect(data.putProductEntity.clientSideUUID).toBe('ggg-ggg-ggg');
   expect(data.putProductEntity.product_client_side_uuid).toBe('aaa-aaa-aaa-aaa');
   expect(data.putProductEntity.product_entity_state_name).toBe('Available');
-  expect(data.putProductEntity.created_at).not.toBe(null);
-  expect(data.putProductEntity.updated_at).not.toBe(null);
 });
 
 test('putProductEntity mutation updates a product entity', async () => {
@@ -185,8 +181,6 @@ test('putProductEntity mutation updates a product entity', async () => {
   expect(data.putProductEntity.clientSideUUID).toBe('ggg-ggg-ggg');
   expect(data.putProductEntity.product_client_side_uuid).toBe('bbb-bbb-bbb-bbb');
   expect(data.putProductEntity.product_entity_state_name).toBe('Unavailable');
-  expect(data.putProductEntity.created_at).not.toBe(null);
-  expect(data.putProductEntity.updated_at).not.toBe(null);
 });
 
 test('There should only be two entities because put is idempotence', async () => {

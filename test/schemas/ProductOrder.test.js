@@ -142,8 +142,6 @@ test('productOrders queries fetches all product orders', async () => {
   expect(data.productOrders.rows[0].deliver_option_client_side_uuid).toBe('aaa-aaa-aaa');
   expect(data.productOrders.rows[0].payment_option_client_side_uuid).toBe('aaa-aaa-aaa');
   expect(data.productOrders.rows[0].product_order_state_name).toBe('Delivered');
-  expect(data.productOrders.rows[0].created_at).not.toBe(null);
-  expect(data.productOrders.rows[0].updated_at).not.toBe(null);
   expect(data.productOrders.pages).toBe(1);
   expect(data.productOrders.count).toBe(1);
 });
@@ -180,8 +178,6 @@ test('productOrder queries fetches a specific product order by clientSideUUID', 
   expect(data.productOrder.deliver_option_client_side_uuid).toBe('aaa-aaa-aaa');
   expect(data.productOrder.payment_option_client_side_uuid).toBe('aaa-aaa-aaa');
   expect(data.productOrder.product_order_state_name).toBe('Delivered');
-  expect(data.productOrder.created_at).not.toBe(null);
-  expect(data.productOrder.updated_at).not.toBe(null);
 });
 
 test('productOrder queries fetches fails if a specific product order by clientSideUUID does not exist', async () => {

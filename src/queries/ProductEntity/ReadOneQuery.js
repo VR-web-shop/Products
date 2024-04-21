@@ -2,14 +2,16 @@ import _ReadOneQuery from "../abstractions/ReadOneQuery.js";
 import ProductEntityDTO from "../../dtos/ProductEntity.js";
 
 export default class ReadOneQuery extends _ReadOneQuery {
-    constructor(clientSideUUID) {
+    constructor(clientSideUUID, additionalParams = {}) {
         super(
             clientSideUUID, 
             "client_side_uuid",
             ProductEntityDTO, 
-            "ProductEntity", 
+            "ProductEntities", 
             "ProductEntityDescription", 
-            "ProductEntityRemoved"
+            "ProductEntityRemoved",
+            "product_entity_client_side_uuid",
+            additionalParams
         );
     }
 }

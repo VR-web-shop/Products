@@ -2,13 +2,16 @@ import _ReadCollectionQuery from "../abstractions/ReadCollectionQuery.js";
 import ProductOrderEntityDTO from "../../dtos/ProductOrderEntity.js";
 
 export default class ReadCollectionQuery extends _ReadCollectionQuery {
-    constructor(options={}) {
+    constructor(options={}, snapshotOptions={}) {
         super(
             options, 
             ProductOrderEntityDTO, 
-            "ProductOrderEntity", 
+            "ProductOrderEntities", 
             "ProductOrderEntityDescription", 
-            "ProductOrderEntityRemoved"
+            "ProductOrderEntityRemoved",
+            snapshotOptions,
+            "product_order_entity_client_side_uuid",
+            "client_side_uuid"
         );
     }
 }

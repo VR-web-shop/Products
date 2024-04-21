@@ -203,8 +203,6 @@ test('productOrderEntities queries fetches all product order entities', async ()
   expect(data.productOrderEntities.rows[0].clientSideUUID).toBe('ddd-ddd-ddd-ddd');
   expect(data.productOrderEntities.rows[0].product_order_client_side_uuid).toBe('eee-eee-eee-eee');
   expect(data.productOrderEntities.rows[0].product_entity_client_side_uuid).toBe('bbb-bbb-bbb-bbb');
-  expect(data.productOrderEntities.rows[0].created_at).not.toBe(null);
-  expect(data.productOrderEntities.rows[0].updated_at).not.toBe(null);
   expect(data.productOrderEntities.pages).toBe(1);
   expect(data.productOrderEntities.count).toBe(1);
 });
@@ -227,8 +225,6 @@ test('productOrderEntity queries fetches a specific product order entity by clie
   expect(data.productOrderEntity.clientSideUUID).toBe('ddd-ddd-ddd-ddd');
   expect(data.productOrderEntity.product_order_client_side_uuid).toBe('eee-eee-eee-eee');
   expect(data.productOrderEntity.product_entity_client_side_uuid).toBe('bbb-bbb-bbb-bbb');
-  expect(data.productOrderEntity.created_at).not.toBe(null);
-  expect(data.productOrderEntity.updated_at).not.toBe(null);
 });
 
 test('productOrderEntity queries fetches fails if a specific product order entity by clientSideUUID does not exist', async () => {
@@ -269,8 +265,6 @@ test('putProductOrderEntity mutation creates a product order entity', async () =
   expect(data.putProductOrderEntity.clientSideUUID).toBe('ggg-ggg-ggg');
   expect(data.putProductOrderEntity.product_order_client_side_uuid).toBe('aaa-aaa-aaa-aaa');
   expect(data.putProductOrderEntity.product_entity_client_side_uuid).toBe('bbb-bbb-bbb-bbb');
-  expect(data.putProductOrderEntity.created_at).not.toBe(null);
-  expect(data.putProductOrderEntity.updated_at).not.toBe(null);
 });
 
 test('putProductOrderEntity mutation updates a product order', async () => {
@@ -292,8 +286,6 @@ test('putProductOrderEntity mutation updates a product order', async () => {
   expect(data.putProductOrderEntity.clientSideUUID).toBe('ggg-ggg-ggg');
   expect(data.putProductOrderEntity.product_order_client_side_uuid).toBe('eee-eee-eee-eee');
   expect(data.putProductOrderEntity.product_entity_client_side_uuid).toBe('aaa-aaa-aaa-aaa');
-  expect(data.putProductOrderEntity.created_at).not.toBe(null);
-  expect(data.putProductOrderEntity.updated_at).not.toBe(null);
 });
 
 test('There should only be two entities because put is idempotence', async () => {

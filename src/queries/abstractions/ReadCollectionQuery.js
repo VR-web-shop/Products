@@ -1,8 +1,19 @@
 import ModelQuery from "./ModelQuery.js";
+import { QueryTypes } from "sequelize";
 
 export default class ReadCollectionQuery extends ModelQuery {
-    constructor(options = {}, dto, modelName, snapshotName = null, tombstoneName = null) {
+    constructor(
+        options = {}, 
+        dto, 
+        tableName, 
+        snapshotName = null, 
+        tombstoneName = null,
+        snapshotOptions = {},
+        fkName = null,
+        pkName = null,
+    ) {
         super();
+        
         if (typeof options !== "object") {
             throw new Error("Options must be an object");
         }
@@ -11,8 +22,8 @@ export default class ReadCollectionQuery extends ModelQuery {
             throw new Error("dto is required and must be a function");
         }
 
-        if (!modelName || typeof modelName !== "string") {
-            throw new Error("modelName is required and must be a string");
+        if (!tableName || typeof tableName !== "string") {
+            throw new Error("tableName is required and must be a string");
         }
 
         if (snapshotName && typeof snapshotName !== "string") {
@@ -25,9 +36,12 @@ export default class ReadCollectionQuery extends ModelQuery {
 
         this.options = options;
         this.dto = dto;
-        this.modelName = modelName;
+        this.tableName = tableName;
         this.snapshotName = snapshotName;
         this.tombstoneName = tombstoneName;
+        this.snapshotOptions = snapshotOptions;
+        this.fkName = fkName;
+        this.pkName = pkName;
     }
 
     async execute(db) {
@@ -36,58 +50,87 @@ export default class ReadCollectionQuery extends ModelQuery {
         }
 
         const options = this.options;
-        const dto = this.dto;
-        const modelName = this.modelName;
-        const snapshotName = this.snapshotName;
-        const tombstoneName = this.tombstoneName;
 
-        const limit = options.limit || 10;
-        const page = options.page || 1;
-        const offset = (page - 1) * limit;
+        let limit, page, offset;
 
-        const where = options.where || {};
-        const params = { limit, offset, where, include: [] };
+        if (options.limit) {
+            limit = parseInt(options.limit);
 
-        const countAll = await db[modelName].count({ where });
-        let countTombstones = 0;
-
-        if (snapshotName) {
-            params.include.push({
-                model: db[snapshotName],
-                order: [["created_at", "DESC"]],
-                limit: 1
-            });
-        }
-
-        if (tombstoneName) {
-            params.include.push({
-                model: db[tombstoneName],
-                order: [["created_at", "DESC"]],
-                limit: 1
-            });
-
-            countTombstones = await db[tombstoneName].count({ where });
-        }
-        
-        const entities = await db[modelName].findAll(params);
-        const rows = [];
-        entities.forEach(entity => {
-            if (tombstoneName) {
-                const hasTombstone = entity[`${tombstoneName}s`] && entity[`${tombstoneName}s`].length > 0;
-                if (hasTombstone) return;
+            if (limit < 1) {
+                throw new APIActorError("limit must be greater than 0", 400);
             }
+        }
+
+        if (options.page) {
+            page = parseInt(options.page);
             
-            if (snapshotName) {
-                const snapshot = entity[`${snapshotName}s`][0];
-                rows.push(dto(snapshot, entity));
-            } else {
-                rows.push(dto(entity));
+            if (page < 1) {
+                throw new APIActorError("page must be greater than 0", 400);
             }
-        });
 
-        const count = countAll - countTombstones;
-        const pages = Math.ceil(count / limit);
+            if (!limit) {
+                throw new APIActorError("limit is required when using page", 400);
+            }
 
-        return { rows, pages, count };
+            offset = (page - 1) * limit;
+        }
+
+        const mTable = this.tableName
+        const sTable = this.snapshotName ? `${this.snapshotName}s` : null;
+        const tTable = this.tombstoneName ? `${this.tombstoneName}s` : null;
+        const fkName = this.fkName;
+        const pkName = this.pkName;
+        const where = options.where;
+
+        const queryOptions = {
+            limit, 
+            offset, 
+            mTable, 
+            sTable, 
+            tTable, 
+            where, 
+            fkName, 
+            pkName, 
+        }
+
+        const countOptions = {
+            mTable, 
+            sTable, 
+            tTable, 
+            where, 
+            fkName, 
+            pkName, 
+        }
+
+        const replacements = {
+            limit, 
+            offset, 
+        };
+
+        if (options.where) {
+            options.where.forEach(w => {
+                replacements[w.table] = w.table;
+                replacements[w.column] = w.column;
+                replacements[w.key] = w.value;
+            });
+        }
+
+        const selectSQL = ModelQuery.getSql({ prefix: "SELECT *", ...queryOptions });
+        const countSQL = ModelQuery.getSql({ prefix: "SELECT COUNT(*)", ...countOptions });
+        const queryOpt = { type: QueryTypes.SELECT, replacements };
+
+        const entities = await db.sequelize.query(selectSQL, queryOpt);
+        const countRes = await db.sequelize.query(countSQL, queryOpt);
+
+        const count = countRes[0]["COUNT(*)"];
+        const rows = entities.map(entity => this.dto(entity));
+        const result = { rows, count };
+
+        if (page) {
+            const pages = Math.ceil(count / limit);
+            result.pages = pages;
+        }
+
+        return result;
     }
 }
