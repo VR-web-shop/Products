@@ -5,6 +5,9 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.bulkInsert('ProductEntityStates', [
       {
+        name: 'SYSTEM_FAILURE',
+      },
+      {
         name: 'AVAILABLE_FOR_PURCHASE',
       },
       {

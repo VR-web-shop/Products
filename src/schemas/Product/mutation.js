@@ -1,12 +1,10 @@
 import RequestError from "../RequestError/RequestError.js";
 import ModelQueryService from "../../services/ModelQueryService.js";
-import ModelCommandService from "../../services/ModelCommandService.js";
 import ReadOneQuery from "../../queries/Product/ReadOneQuery.js";
-import PutCommand from "../../commands/Product/PutCommand.js";
-import DeleteCommand from "../../commands/Product/DeleteCommand.js";
+import PutProductSaga from "../../sagas/Product/PutProductSaga.js";
+import DeleteProductSaga from "../../sagas/Product/DeleteProductSaga.js";
 import Restricted from "../../jwt/Restricted.js";
 
-const commandService = ModelCommandService();
 const queryService = ModelQueryService();
 
 const resolvers = {
@@ -14,9 +12,9 @@ const resolvers = {
         putProduct: async (_, { input }, context) => {
             try {
                 return await Restricted({ context, permission: 'products:put' }, async () => {
-                    const { clientSideUUID, name, description, thumbnail_source, price } = input;
-                    await commandService.invoke(new PutCommand(clientSideUUID, { name, description, thumbnail_source, price }));
-                    const entity = await queryService.invoke(new ReadOneQuery(clientSideUUID));
+                    const { clientSideUUID: client_side_uuid, name, description, thumbnail_source, price } = input;
+                    await PutProductSaga.execute({ client_side_uuid, name, description, thumbnail_source, price });
+                    const entity = await queryService.invoke(new ReadOneQuery(client_side_uuid));
                     return { __typename: 'Product', ...entity };
                 })
             } catch (error) {
@@ -28,7 +26,7 @@ const resolvers = {
         deleteProduct: async (_, { clientSideUUID }, context) => {
             try {
                 return await Restricted({ context, permission: 'products:delete' }, async () => {
-                    await commandService.invoke(new DeleteCommand(clientSideUUID));
+                    await DeleteProductSaga.execute({ client_side_uuid: clientSideUUID });
                     return { __typename: 'BooleanResult', result: true };
                 })
             } catch (error) {

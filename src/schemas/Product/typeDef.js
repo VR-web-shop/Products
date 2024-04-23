@@ -4,6 +4,8 @@ const typeDef = `
         name: String!
         description: String!
         thumbnail_source: String!
+        transaction_state_name: String
+        transaction_message: String
         price: Float!
         created_at: String
         updated_at: String

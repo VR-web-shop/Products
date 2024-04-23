@@ -2,12 +2,17 @@ import pkg from 'amqplib';
 import BrokerServiceConsumer from './BrokerServiceConsumer.js';
 
 const url = process.env.MESSAGE_BROKER_URL;
+const addOnConnect = [];
 const queues = [];
 let ch, conn;
 
 const addListener = (queueName, callback) => {
     if (queues.includes(queueName)) {
         throw new Error(`Queue ${queueName} is already being listened to.`);
+    }
+    if (!conn || !ch) {
+        addOnConnect.push({ queueName, callback });
+        return;
     }
 
     queues.push(queueName);
@@ -37,6 +42,10 @@ const connect = async () => {
     for (const conf of BrokerServiceConsumer.config) {
         addListener(conf.type, conf.callback);
     }
+
+    for (const conf of addOnConnect) {
+        addListener(conf.queueName, conf.callback);
+    }
 }
 
 export default {
@@ -45,3 +54,4 @@ export default {
     removeListener,
     sendMessage,
 }
+

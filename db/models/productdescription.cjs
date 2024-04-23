@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'product_client_side_uuid', 
         targetKey: 'client_side_uuid'
       });
+      models.ProductDescription.belongsTo(models.TransactionState, {
+        foreignKey: 'transaction_state_name',
+        targetKey: 'name'
+      });
     }
   }
   ProductDescription.init({
@@ -51,6 +55,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
+    transaction_state_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    transaction_message: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    }
   }, {
     sequelize,
     modelName: 'ProductDescription',

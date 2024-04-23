@@ -39,6 +39,18 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      transaction_state_name: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        references: {
+          model: 'TransactionStates',
+          key: 'name'
+        },
+      },
+      transaction_message: {
+        type: Sequelize.STRING,
+        allowNull: true
+      }
     });
   },
   async down(queryInterface, Sequelize) {

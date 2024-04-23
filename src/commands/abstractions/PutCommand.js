@@ -59,7 +59,7 @@ export default class PutCommand extends ModelCommand {
         const modelName = this.modelName;
         const snapshotName = this.snapshotName;
         const tombstoneName = this.tombstoneName;
-
+        console.log(params)
         try {
             await db.sequelize.transaction(async t => {
                 let entity = await db[modelName].findOne(

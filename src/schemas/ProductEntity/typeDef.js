@@ -3,6 +3,8 @@ const typeDef = `
         clientSideUUID: String!
         product_entity_state_name: String!
         product_client_side_uuid: String!
+        transaction_state_name: String
+        transaction_message: String
         created_at: String
         updated_at: String
     }

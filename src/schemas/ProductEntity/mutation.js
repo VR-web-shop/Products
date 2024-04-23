@@ -2,7 +2,7 @@ import RequestError from "../RequestError/RequestError.js";
 import ModelQueryService from "../../services/ModelQueryService.js";
 import ModelCommandService from "../../services/ModelCommandService.js";
 import ReadOneQuery from "../../queries/ProductEntity/ReadOneQuery.js";
-import PutCommand from "../../commands/ProductEntity/PutCommand.js";
+import PutProductEntitySaga from "../../sagas/ProductEntity/PutProductEntitySaga.js";
 import DeleteCommand from "../../commands/ProductEntity/DeleteCommand.js";
 import Restricted from "../../jwt/Restricted.js";
 
@@ -14,9 +14,9 @@ const resolvers = {
 	putProductEntity: async (_, { input }, context) => {
 		try {
 			return await Restricted({ context, permission: 'product-entities:put' }, async () => {
-				const { clientSideUUID, product_entity_state_name, product_client_side_uuid } = input;
-				await commandService.invoke(new PutCommand(clientSideUUID, { product_entity_state_name, product_client_side_uuid }));
-				const entity = await queryService.invoke(new ReadOneQuery(clientSideUUID));
+				const { clientSideUUID: client_side_uuid, product_entity_state_name, product_client_side_uuid } = input;
+				await PutProductEntitySaga.execute({ client_side_uuid, product_entity_state_name, product_client_side_uuid });
+				const entity = await queryService.invoke(new ReadOneQuery(client_side_uuid));
 				return { __typename: 'ProductEntity', ...entity };
 			})
 		} catch (error) {

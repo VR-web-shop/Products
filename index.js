@@ -1,7 +1,7 @@
 import 'dotenv/config'
 
+import Sagas from "@vr-web-shop/sagas";
 import GraphQLHandler from './src/schemas/base.js'
-import BrokerService from './src/services/BrokerService.js';
 import FileUploadController from './src/controllers/FileUploadController.js';
 
 import express from 'express';
@@ -11,7 +11,7 @@ import cors from 'cors';
     /**
      * Connect to message broker
      */
-    await BrokerService.connect();
+    await Sagas.BrokerService.connect();
 
     /**
      * Create express app

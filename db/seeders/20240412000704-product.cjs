@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    const data = require('../../demo_products.json');
+    const data = require('../../data/demo_products.json');
     const products = []
     const productDescriptions = []
 
@@ -25,7 +25,7 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Products', null, {});
     await queryInterface.bulkDelete('ProductDescriptions', null, {});
+    await queryInterface.bulkDelete('Products', null, {});
   }
 };
