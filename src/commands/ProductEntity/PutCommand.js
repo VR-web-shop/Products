@@ -7,7 +7,7 @@ export default class PutCommand extends _PutCommand {
             params, 
             "client_side_uuid",
             "product_entity_client_side_uuid", 
-            ["product_entity_state_name", "product_client_side_uuid", "transaction_state_name", "transaction_message"],
+            ["product_entity_state_name", "product_client_side_uuid", "distributed_transaction_transaction_uuid"],
             "ProductEntity",
             "ProductEntityDescription",
             "ProductEntityRemoved"

@@ -12,7 +12,7 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    await queryInterface.bulkInsert('TransactionStates', [
+    await queryInterface.bulkInsert('DistributedTransactionStates', [
       {
         name: 'PENDING',
       },
@@ -32,6 +32,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    await queryInterface.bulkDelete('TransactionStates', null, {});
+    await queryInterface.bulkDelete('DistributedTransactionStates', null, {});
   }
 };

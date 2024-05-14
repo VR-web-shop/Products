@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'valuta_setting_client_side_uuid',
         targetKey: 'client_side_uuid'
       });
+      models.ValutaSettingDescription.belongsTo(models.DistributedTransaction, {
+        foreignKey: 'distributed_transaction_transaction_uuid',
+        sourceKey: 'transaction_uuid'
+      });
     }
   }
   ValutaSettingDescription.init({
@@ -50,6 +54,10 @@ module.exports = (sequelize, DataTypes) => {
     valuta_setting_client_side_uuid: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    distributed_transaction_transaction_uuid: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
   }, {
     sequelize,

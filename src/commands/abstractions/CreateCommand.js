@@ -26,7 +26,7 @@ export default class CreateCommand extends ModelCommand {
         this.modelName = modelName;
     }
 
-    async execute(db) {
+    async execute(db, options={}) {
         if (!db || typeof db !== "object") {
             throw new Error("db is required and must be an object");
         }
@@ -47,10 +47,22 @@ export default class CreateCommand extends ModelCommand {
                     throw new RequestError(400, `Entity with ${pkName} ${pk} already exists`);
                 }
 
+                if (options.beforeTransactions) {
+                    for (const transaction of options.beforeTransactions) {
+                        await transaction(db, t, pk, params);
+                    }
+                }
+
                 await db[modelName].create(
                     { [pkName]: pk, ...params }, 
                     { transaction: t }
                 );
+
+                if (options.afterTransactions) {
+                    for (const transaction of options.afterTransactions) {
+                        await transaction(db, t, pk, params);
+                    }
+                }
             });
         } catch (error) {
             console.log(error)

@@ -11,7 +11,8 @@ export default class ReadOneQuery extends ModelQuery {
         snapshotName = null, 
         tombstoneName = null,
         fkName = null,
-        additionalParams = {}
+        additionalParams = {},
+        useDTable = false
     ) {
         super();
 
@@ -55,6 +56,7 @@ export default class ReadOneQuery extends ModelQuery {
         this.tombstoneName = tombstoneName;
         this.fkName = fkName;
         this.additionalParams = additionalParams;
+        this.useDTable = useDTable;
     }
 
     async execute(db) {
@@ -67,6 +69,7 @@ export default class ReadOneQuery extends ModelQuery {
         const tTable = this.tombstoneName ? `${this.tombstoneName}s` : null;
         const fkName = this.fkName;
         const pkName = this.pkName;
+        const useDTable = this.useDTable;
         const limit = 1;
         const where = [{ 
             table: mTable, 
@@ -82,7 +85,8 @@ export default class ReadOneQuery extends ModelQuery {
             fkName, 
             pkName, 
             limit,
-            where
+            where,
+            useDTable,
         }
 
         if (this.additionalParams.where) {

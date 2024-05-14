@@ -35,7 +35,7 @@ const AuthorizeJWT = function (context) {
  * @param {string} permissionName
  * @returns {void}
  */
-const AuthorizePermissionJWT = function (context, permission) {
+const AuthorizePermissionJWT = function (context, permissionName) {
     const { req } = context;
     const user = req.user;
     if (!user) {
@@ -44,8 +44,10 @@ const AuthorizePermissionJWT = function (context, permission) {
 
     const { permissions } = user;
     let hasPermission = false;
-    for (const userPermission of permissions) {
-        if (userPermission === permission) {
+
+    for (const permission of permissions) {
+
+        if (permission === permissionName) {
             hasPermission = true;
             break;
         }

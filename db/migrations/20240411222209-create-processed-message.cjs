@@ -2,11 +2,16 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('TransactionStates', {
-      name: {
-        allowNull: false,
-        primaryKey: true,
-        type: Sequelize.STRING
+    await queryInterface.createTable('ProcessedMessages', {
+      subscriberID: {
+        type: Sequelize.STRING,
+        field: 'subscriber_id',
+        primaryKey: true
+      },
+      messageUUID: {
+        type: Sequelize.UUID,
+        field: 'message_uuid',
+        primaryKey: true
       },
       createdAt: {
         allowNull: false,
@@ -17,12 +22,12 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        field: 'created_at',
+        field: 'updated_at',
         defaultValue: Sequelize.fn('now')
-      }
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('TransactionStates');
+    await queryInterface.dropTable('ProcessedMessages');
   }
 };

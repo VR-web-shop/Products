@@ -4,6 +4,7 @@ import ModelQueryService from "../../services/ModelQueryService.js";
 import ReadOneQuery from "../../queries/Product/ReadOneQuery.js";
 import ReadCollectionQuery from "../../queries/Product/ReadCollectionQuery.js";
 import Restricted from "../../jwt/Restricted.js";
+import rollbar from "../../../rollbar.js";
 
 const service = ModelQueryService();
 
@@ -16,9 +17,14 @@ const resolvers = {
 				return { __typename: 'Products', rows, pages, count };
 			})
 		} catch (error) {
+			if (error instanceof RequestError) {
+				rollbar.info('RequestError', { code: error.code, message: error.message })
+				return error.toResponse();
+			}
+			
+			rollbar.error(error);
 			console.log('error', error);
-			if (error instanceof RequestError) return error.toResponse();
-			else throw new Error('Failed to get products');
+			throw new Error('Failed to get products');
 		}
 	},
 	product: async (_, { clientSideUUID }, context) => {
@@ -28,9 +34,14 @@ const resolvers = {
 				return { __typename: 'Product', ...entity };
 			})
 		} catch (error) {
+			if (error instanceof RequestError) {
+				rollbar.info('RequestError', { code: error.code, message: error.message })
+				return error.toResponse();
+			}
+			
+			rollbar.error(error);
 			console.log('error', error);
-			if (error instanceof RequestError) return error.toResponse();
-			else throw new Error('Failed to get product');
+			throw new Error('Failed to get product');
 		}
 	}
   }

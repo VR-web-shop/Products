@@ -1,17 +1,20 @@
 import RequestError from "../RequestError/RequestError.js";
 import ModelQueryService from "../../services/ModelQueryService.js";
-import ModelCommandService from "../../services/ModelCommandService.js";
 import ReadOneQuery from "../../queries/ProductEntityState/ReadOneQuery.js";
+import ModelCommandService from "../../services/ModelCommandService.js";
 import CreateCommand from "../../commands/ProductEntityState/CreateCommand.js";
 import Restricted from "../../jwt/Restricted.js";
+import rollbar from "../../../rollbar.js";
 
-const commandService = ModelCommandService();
 const queryService = ModelQueryService();
+const commandService = ModelCommandService();
 
 const resolvers = {
   Mutation: {
     createProductEntityState: async (_, { input }, context) => {
       try {
+        throw new RequestError('Deprecated', 'This mutation is deprecated.', 410)
+        
         return await Restricted({ context, permission: 'product-entity-states:create' }, async () => {
           const { name } = input;
           await commandService.invoke(new CreateCommand(name));
@@ -19,9 +22,15 @@ const resolvers = {
           return { __typename: 'ProductEntityState', ...entity };
         })
       } catch (error) {
+        if (error instanceof RequestError) {
+          rollbar.info('RequestError', { code: error.code, message: error.message })
+          return error.toResponse();
+        }
+        
+        rollbar.error(error);
         console.log('error', error);
-        if (error instanceof RequestError) return error.toResponse();
-        else throw new Error('Failed to put product entity state');
+        throw new Error('Failed to create product entity state');
+        
       }
     }
   }

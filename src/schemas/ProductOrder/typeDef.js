@@ -10,6 +10,8 @@ const typeDef = `
         deliver_option_client_side_uuid: String!
         payment_option_client_side_uuid: String!
         product_order_state_name: String!
+        transaction_state_name: String
+        transaction_message: String
         created_at: String
         updated_at: String
     }

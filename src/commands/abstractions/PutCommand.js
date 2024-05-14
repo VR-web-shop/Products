@@ -46,7 +46,7 @@ export default class PutCommand extends ModelCommand {
         this.tombstoneName = tombstoneName;
     }
 
-    async execute(db) {
+    async execute(db, options={}) {
         if (!db || typeof db !== "object") {
             throw new Error("db is required and must be an object");
         }
@@ -59,9 +59,9 @@ export default class PutCommand extends ModelCommand {
         const modelName = this.modelName;
         const snapshotName = this.snapshotName;
         const tombstoneName = this.tombstoneName;
-        console.log(params)
+    
         try {
-            await db.sequelize.transaction(async t => {
+            const executeTransaction = async (transaction) => {
                 let entity = await db[modelName].findOne(
                     { 
                         where: { [pkName]: pk },
@@ -78,19 +78,19 @@ export default class PutCommand extends ModelCommand {
                             }
                         ]
                     },
-                    { transaction: t }
+                    { transaction }
                 );
 
                 if (!entity) {
                     entity = await db[modelName].create(
                         { [pkName]: pk }, 
-                        { transaction: t }
+                        { transaction }
                     );
                 } else if (entity[`${tombstoneName}s`].length > 0) {
                     // Undo remove
                     await db[tombstoneName].destroy(
                         { where: { [fkName]: pk } },
-                        { transaction: t }
+                        { transaction }
                     );
                 }
 
@@ -104,11 +104,29 @@ export default class PutCommand extends ModelCommand {
                     if (currentCAS === inputCAS) return; // No changes
                 }
 
+                if (options.beforeTransactions) {
+                    for (const transaction of options.beforeTransactions) {
+                        await transaction(db, transaction, pk, params);
+                    }
+                }
+
                 await db[snapshotName].create(
                     { [fkName]: pk, ...params }, 
-                    { transaction: t }
+                    { transaction }
                 );
-            });
+
+                if (options.afterTransactions) {
+                    for (const transaction of options.afterTransactions) {
+                        await transaction(db, transaction, pk, params);
+                    }
+                }
+            };
+
+            if (options.transaction) {
+                await executeTransaction(options.transaction);
+            } else {
+                await db.sequelize.transaction(async t => await executeTransaction(t));
+            }
         } catch (error) {
             console.log(error)
             throw new Error("Error in put");

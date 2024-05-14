@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'product_order_entity_client_side_uuid', 
         targetKey: 'client_side_uuid'
       });
+      models.ProductOrderEntityDescription.belongsTo(models.DistributedTransaction, {
+        foreignKey: 'distributed_transaction_transaction_uuid',
+        sourceKey: 'transaction_uuid'
+      });
       /*
       models.ProductOrderEntityDescription.belongsToMany(models.ProductOrder, {
         through: models.ProductOrderDescription,
@@ -66,6 +70,10 @@ module.exports = (sequelize, DataTypes) => {
     product_order_entity_client_side_uuid: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    distributed_transaction_transaction_uuid: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
   }, {
     sequelize,

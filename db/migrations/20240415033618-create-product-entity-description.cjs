@@ -31,18 +31,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      transaction_state_name: {
+      distributed_transaction_transaction_uuid: {
         type: Sequelize.STRING,
         allowNull: true,
         references: {
-          model: 'TransactionStates',
-          key: 'name'
-        },
+          model: 'DistributedTransactions',
+          key: 'transaction_uuid'
+        }
       },
-      transaction_message: {
-        type: Sequelize.STRING,
-        allowNull: true
-      }
     });
   },
   async down(queryInterface, Sequelize) {
