@@ -16,7 +16,8 @@ export default class PutCommand extends _PutCommand {
                 "postal_code",
                 "product_order_state_name",
                 "deliver_option_client_side_uuid",
-                "payment_option_client_side_uuid"
+                "payment_option_client_side_uuid", 
+                "distributed_transaction_transaction_uuid"
             ],
             "ProductOrder",
             "ProductOrderDescription",

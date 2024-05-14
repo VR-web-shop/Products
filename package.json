@@ -37,9 +37,9 @@
     "swagger-ui-express": "^5.0.0"
   },
   "dependencies": {
-    "@vr-web-shop/sagas": "1.0.3",
     "@aws-sdk/client-s3": "^3.540.0",
     "@aws-sdk/lib-storage": "^3.540.0",
+    "@vr-web-shop/sagas": "1.0.3",
     "amqplib": "^0.10.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -47,11 +47,13 @@
     "graphql": "^15.8.0",
     "graphql-http": "^1.22.1",
     "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.9.4",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.9.7",
     "node-sagas": "^0.0.6",
+    "rollbar": "^2.26.4",
     "sequelize": "^6.37.1",
     "sqlite3": "^5.1.7",
-    "multer": "^1.4.5-lts.1",
+    "uuid": "^9.0.1",
     "vitest": "^1.5.0"
   }
 }

@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'product_order_state_name',
         targetKey: 'name'
       });
+      models.ProductOrderDescription.belongsTo(models.DistributedTransaction, {
+        foreignKey: 'distributed_transaction_transaction_uuid',
+        sourceKey: 'transaction_uuid'
+      });
     }
   }
   ProductOrderDescription.init({
@@ -82,6 +86,10 @@ module.exports = (sequelize, DataTypes) => {
     product_order_client_side_uuid: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    distributed_transaction_transaction_uuid: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
   }, {
     sequelize,

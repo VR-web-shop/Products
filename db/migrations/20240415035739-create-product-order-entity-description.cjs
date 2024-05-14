@@ -21,15 +21,23 @@ module.exports = {
       },
       product_order_client_side_uuid: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       product_entity_client_side_uuid: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       product_order_entity_client_side_uuid: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
+      },
+      distributed_transaction_transaction_uuid: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        references: {
+          model: 'DistributedTransactions',
+          key: 'transaction_uuid'
+        }
       },
     });
   },

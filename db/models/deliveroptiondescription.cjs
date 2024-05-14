@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'deliver_option_client_side_uuid',
         targetKey: 'client_side_uuid'
       });
+      models.DeliverOptionDescription.belongsTo(models.DistributedTransaction, {
+        foreignKey: 'distributed_transaction_transaction_uuid',
+        sourceKey: 'transaction_uuid'
+      });
     }
   }
   DeliverOptionDescription.init({
@@ -42,6 +46,10 @@ module.exports = (sequelize, DataTypes) => {
     deliver_option_client_side_uuid: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    distributed_transaction_transaction_uuid: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
   }, {
     sequelize,

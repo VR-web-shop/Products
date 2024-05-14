@@ -32,7 +32,7 @@ export default class DeleteCommand extends ModelCommand {
         this.tombstoneName = tombstoneName;
     }
 
-    async execute(db) {
+    async execute(db, options={}) {
         if (!db || typeof db !== "object") {
             throw new Error("db is required and must be an object");
         }

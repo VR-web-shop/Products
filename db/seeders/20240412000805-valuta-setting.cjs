@@ -6,7 +6,8 @@ module.exports = {
     await queryInterface.bulkInsert('ValutaSettings', [
       { client_side_uuid: 'aaa-bbb-ccc' },
       { client_side_uuid: 'ddd-eee-fff' },
-      { client_side_uuid: 'ggg-hhh-iii' }
+      { client_side_uuid: 'ggg-hhh-iii' },
+      { client_side_uuid: 'hhh-iii-jjj' }
     ], {});
 
     await queryInterface.bulkInsert('ValutaSettingDescriptions', [

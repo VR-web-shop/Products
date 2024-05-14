@@ -41,9 +41,9 @@ import ValutaSettingQuery from "./ValutaSetting/query.js";
 import ValutaSettingTypeDef from "./ValutaSetting/typeDef.js";
 
 const typeDefs = mergeTypeDefs([
+    ProductTypeDef,
     DeliverOptionTypeDef,
     PaymentOptionTypeDef,
-    ProductTypeDef,
     ProductEntityTypeDef,
     ProductEntityStateTypeDef,
     ProductOrderTypeDef,

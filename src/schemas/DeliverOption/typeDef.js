@@ -3,6 +3,8 @@ const typeDef = `
         clientSideUUID: String!
         name: String!
         price: Float!
+        transaction_state_name: String
+        transaction_message: String
         created_at: String
         updated_at: String
     }

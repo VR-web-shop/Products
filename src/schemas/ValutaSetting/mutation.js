@@ -5,6 +5,7 @@ import ReadOneQuery from "../../queries/ValutaSetting/ReadOneQuery.js";
 import PutCommand from "../../commands/ValutaSetting/PutCommand.js";
 import DeleteCommand from "../../commands/ValutaSetting/DeleteCommand.js";
 import Restricted from "../../jwt/Restricted.js";
+import rollbar from "../../../rollbar.js";
 
 const commandService = ModelCommandService();
 const queryService = ModelQueryService();
@@ -20,9 +21,14 @@ const resolvers = {
 				return { __typename: 'ValutaSetting', ...entity };
 			})
 		} catch (error) {
+			if (error instanceof RequestError) {
+				rollbar.info('RequestError', { code: error.code, message: error.message })
+				return error.toResponse();
+			}
+
+			rollbar.error(error);
 			console.log('error', error);
-			if (error instanceof RequestError) return error.toResponse();
-			else throw new Error('Failed to put valuta setting');
+			throw new Error('Failed to put valuta setting');
 		}
 	},
 	deleteValutaSetting: async (_, { clientSideUUID }, context) => {
@@ -32,9 +38,14 @@ const resolvers = {
 				return { __typename: 'BooleanResult', result: true };
 			})
 		} catch (error) {
+			if (error instanceof RequestError) {
+				rollbar.info('RequestError', { code: error.code, message: error.message })
+				return error.toResponse();
+			}
+
+			rollbar.error(error);
 			console.log('error', error);
-			if (error instanceof RequestError) return error.toResponse();
-			else throw new Error('Failed to delete product order entity');
+			throw new Error('Failed to delete valuta setting');
 		}
 	}
   }

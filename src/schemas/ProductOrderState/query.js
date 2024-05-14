@@ -3,6 +3,7 @@ import ModelQueryService from "../../services/ModelQueryService.js";
 import ReadOneQuery from "../../queries/ProductOrderState/ReadOneQuery.js";
 import ReadCollectionQuery from "../../queries/ProductOrderState/ReadCollectionQuery.js";
 import Restricted from "../../jwt/Restricted.js";
+import rollbar from "../../../rollbar.js";
 
 const service = ModelQueryService();
 
@@ -15,9 +16,14 @@ const resolvers = {
 					return { __typename: 'ProductOrderStates', rows, pages, count };
 				})
 			} catch (error) {
+				if (error instanceof RequestError) {
+					rollbar.info('RequestError', { code: error.code, message: error.message })
+					return error.toResponse();
+				}
+	
+				rollbar.error(error);
 				console.log('error', error);
-				if (error instanceof RequestError) return error.toResponse();
-				else throw new Error('Failed to get product order states');
+				throw new Error('Failed to get product order states');
 			}
 		},
 		productOrderState: async (_, { name }, context) => {
@@ -27,9 +33,14 @@ const resolvers = {
 					return { __typename: 'ProductOrderState', ...entity };
 				})
 			} catch (error) {
+				if (error instanceof RequestError) {
+					rollbar.info('RequestError', { code: error.code, message: error.message })
+					return error.toResponse();
+				}
+	
+				rollbar.error(error);
 				console.log('error', error);
-				if (error instanceof RequestError) return error.toResponse();
-				else throw new Error('Failed to get product order state');
+				throw new Error('Failed to get product order state');
 			}
 		}
 	}

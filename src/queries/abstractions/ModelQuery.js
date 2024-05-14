@@ -36,7 +36,7 @@ export default  class ModelQuery {
     }
 
     static getSql = (options={}) => {
-        let { limit, offset, mTable, sTable, tTable, where, fkName, pkName, prefix } = options;
+        let { limit, offset, mTable, sTable, tTable, useDTable, where, fkName, pkName, prefix } = options;
 
         return `
             ${prefix} FROM ${mTable}
@@ -50,6 +50,18 @@ export default  class ModelQuery {
                 // Left join the latest created tombstone
                 tTable 
                 ? ` LEFT JOIN ${tTable} ON ${tTable} . ${fkName} = ${mTable} . ${pkName}`
+                : ""
+            }
+            ${
+                // Left join the latest distributed transaction by snapshot
+                useDTable && sTable 
+                ? ` LEFT JOIN distributedtransactions AS dt ON dt . transaction_uuid = ${sTable} . distributed_transaction_transaction_uuid`
+                : ""
+            }
+            ${
+                // Left join the latest distributed transaction by entity
+                useDTable && !sTable 
+                ? ` LEFT JOIN distributedtransactions AS dt ON dt . transaction_uuid = ${mTable} . distributed_transaction_transaction_uuid`
                 : ""
             }
 

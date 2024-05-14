@@ -3,6 +3,7 @@ import ModelQueryService from "../../services/ModelQueryService.js";
 import ReadOneQuery from "../../queries/ValutaSetting/ReadOneQuery.js";
 import ReadCollectionQuery from "../../queries/ValutaSetting/ReadCollectionQuery.js";
 import Restricted from "../../jwt/Restricted.js";
+import rollbar from "../../../rollbar.js";
 
 const service = ModelQueryService();
 
@@ -15,9 +16,14 @@ const resolvers = {
                 return { __typename: 'ValutaSettings', rows, pages, count };
             })
         } catch (error) {
-            console.log('error', error);
-            if (error instanceof RequestError) return error.toResponse();
-            else throw new Error('Failed to get valuta settings');
+            if (error instanceof RequestError) {
+				rollbar.info('RequestError', { code: error.code, message: error.message })
+				return error.toResponse();
+			}
+
+			rollbar.error(error);
+			console.log('error', error);
+			throw new Error('Failed to get valuta settings');
         }
     },
     valutaSetting: async (_, { clientSideUUID }, context) => {
@@ -27,9 +33,14 @@ const resolvers = {
                 return { __typename: 'ValutaSetting', ...entity };
             })
         } catch (error) {
-            console.log('error', error);
-            if (error instanceof RequestError) return error.toResponse();
-            else throw new Error('Failed to get valuta setting');
+            if (error instanceof RequestError) {
+				rollbar.info('RequestError', { code: error.code, message: error.message })
+				return error.toResponse();
+			}
+
+			rollbar.error(error);
+			console.log('error', error);
+			throw new Error('Failed to get valuta setting');
         }
     }
   }

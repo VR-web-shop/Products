@@ -37,20 +37,20 @@ module.exports = {
       },
       product_client_side_uuid: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
+        references: {
+          model: 'Products',
+          key: 'client_side_uuid'
+        }
       },
-      transaction_state_name: {
+      distributed_transaction_transaction_uuid: {
         type: Sequelize.STRING,
         allowNull: true,
         references: {
-          model: 'TransactionStates',
-          key: 'name'
-        },
+          model: 'DistributedTransactions',
+          key: 'transaction_uuid'
+        }
       },
-      transaction_message: {
-        type: Sequelize.STRING,
-        allowNull: true
-      }
     });
   },
   async down(queryInterface, Sequelize) {
