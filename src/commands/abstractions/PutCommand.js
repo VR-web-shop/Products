@@ -105,8 +105,8 @@ export default class PutCommand extends ModelCommand {
                 }
 
                 if (options.beforeTransactions) {
-                    for (const transaction of options.beforeTransactions) {
-                        await transaction(db, transaction, pk, params);
+                    for (const beforeTransaction of options.beforeTransactions) {
+                        await beforeTransaction(db, transaction, pk, params);
                     }
                 }
 
@@ -116,8 +116,8 @@ export default class PutCommand extends ModelCommand {
                 );
 
                 if (options.afterTransactions) {
-                    for (const transaction of options.afterTransactions) {
-                        await transaction(db, transaction, pk, params);
+                    for (const afterTransaction of options.afterTransactions) {
+                        await afterTransaction(db, transaction, pk, params);
                     }
                 }
             };

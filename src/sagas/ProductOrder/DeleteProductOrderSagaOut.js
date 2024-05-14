@@ -1,6 +1,5 @@
 import Sagas from "@vr-web-shop/sagas";
-import Saga from "../../../../saga-v2/SagaHandler.js";
-import IdempotentMessageHandler from "../../../../idempotent-message-handler/IdempotentMessageHandler.js";
+import CreateDistributedTransactionCommand from "../../commands/DistributedTransaction/CreateCommand.js";
 import ModelCommandService from "../../services/ModelCommandService.js";
 import ModelQueryService from "../../services/ModelQueryService.js";
 import ReadOneQuery from "../../queries/ProductOrder/ReadOneQuery.js";
@@ -9,60 +8,56 @@ import DeleteCommand from "../../commands/ProductOrder/DeleteCommand.js";
 import db from "../../../db/models/index.cjs";
 
 const eventName = "Delete_Products_Product_Order";
-const cmdService = ModelCommandService();
-const queryService = ModelQueryService();
+const type = Sagas.SagaHandler.types.START;
 
-const idempotentMessageHandler = new IdempotentMessageHandler(
+const idempotentMessageHandler = new Sagas.IdempotentMessageHandler( eventName, db );
+const handler = new Sagas.SagaHandler.handler({ 
     eventName, 
-    db
-);
-
-const handler = new Saga.handler({ 
-    eventName, 
-    type: Saga.types.START,
+    type,
     defaultParams: {
         product_order_state_name: 'DISCARDED_BY_EMPLOYEE'
     }
-}, Sagas.BrokerService);
+});
+
+const cmdService = ModelCommandService();
+const queryService = ModelQueryService();
 
 const update = async (
     params,
     message_uuid,
     distributed_transaction_transaction_uuid,
     distributed_transaction_state_name,
-    transaction_message,
 ) => {
-    if (message_uuid && await idempotentMessageHandler.existOrCreate(message_uuid)) {
-        console.log("Delete Products Product Order, message_uuid already processed: ", message_uuid);
-        return;
-    }
-
     const lastDescription = await queryService.invoke(new ReadOneQuery(params.client_side_uuid));
 
-    await cmdService.invoke(new PutCommand(params.client_side_uuid, {
-        name: lastDescription.name,
-        email: lastDescription.email,
-        address: lastDescription.address,
-        city: lastDescription.city,
-        country: lastDescription.country,
-        postal_code: lastDescription.postal_code,
-        product_order_state_name: params.product_order_state_name,
-        deliver_option_client_side_uuid: lastDescription.deliver_option_client_side_uuid,
-        payment_option_client_side_uuid: lastDescription.payment_option_client_side_uuid,
-        distributed_transaction_transaction_uuid
-    }), {
-        beforeTransactions: [
-            async (db, t, pk, params) => {
-                await db["DistributedTransaction"].create(
-                    { 
-                        transactionUUID: distributed_transaction_transaction_uuid,
-                        distributed_transaction_state_name,
-                        transaction_message
-                    },
-                    { transaction: t }
-                );
+    await db.sequelize.transaction(async (transaction) => {
+        if (message_uuid && await idempotentMessageHandler.existOrCreate(message_uuid, transaction)) {
+            console.error(`${eventName}, message_uuid already processed: `, message_uuid);
+            return;
+        }
+
+        await cmdService.invoke(new CreateDistributedTransactionCommand(
+            distributed_transaction_transaction_uuid, 
+            { 
+                distributed_transaction_state_name,
+                transaction_message: JSON.stringify({ 
+                    eventName, type, params, message_uuid 
+                })
             }
-        ]
+        ), { transaction });
+    
+        await cmdService.invoke(new PutCommand(params.client_side_uuid, {
+            name: lastDescription.name,
+            email: lastDescription.email,
+            address: lastDescription.address,
+            city: lastDescription.city,
+            country: lastDescription.country,
+            postal_code: lastDescription.postal_code,
+            product_order_state_name: params.product_order_state_name,
+            deliver_option_client_side_uuid: lastDescription.deliver_option_client_side_uuid,
+            payment_option_client_side_uuid: lastDescription.payment_option_client_side_uuid,
+            distributed_transaction_transaction_uuid
+        }), { transaction });
     });
 
     return lastDescription;
@@ -78,12 +73,19 @@ handler.initiateEvent(async (
         null,
         distributed_transaction_transaction_uuid, 
         distributed_transaction_state_name,
-        "Send message to Delete Products Product Order"
     );
 
     return {
         ...params,
-        product_client_side_uuid: lastDesc.product_client_side_uuid
+        product_client_side_uuid: lastDesc.product_client_side_uuid,
+        name: lastDesc.name,
+        email: lastDesc.email,
+        address: lastDesc.address,
+        city: lastDesc.city,
+        country: lastDesc.country,
+        postal_code: lastDesc.postal_code,
+        deliver_option_client_side_uuid: lastDesc.deliver_option_client_side_uuid,
+        payment_option_client_side_uuid: lastDesc.payment_option_client_side_uuid,
     };
 });
 
@@ -97,7 +99,6 @@ handler.onCompleteEvent(async (
         response.message_uuid,
         distributed_transaction_transaction_uuid, 
         distributed_transaction_state_name,
-        "Delete Products Product Order completed"
     );
 
     await cmdService.invoke(new DeleteCommand(
@@ -113,11 +114,11 @@ handler.onReduceEvent(async (
     await update({
             client_side_uuid: response.params.client_side_uuid,
             product_order_state_name: 'SYSTEM_FAILURE',
+            ...response.error
         },
         response.message_uuid,
         distributed_transaction_transaction_uuid, 
         distributed_transaction_state_name,
-        response.error
     );
 });
 
