@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     transaction_message: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true
     },
     createdAt: {

@@ -1,6 +1,4 @@
 import Sagas from "@vr-web-shop/sagas";
-import Saga from "../../../../saga-v2/SagaHandler.js";
-import IdempotentMessageHandler from "../../../../idempotent-message-handler/IdempotentMessageHandler.js";
 import ModelCommandService from "../../services/ModelCommandService.js";
 import PutCommand from "../../commands/ProductOrder/PutCommand.js";
 import PutProductOrderEntityCommand from "../../commands/ProductOrderEntity/PutCommand.js";
@@ -8,30 +6,11 @@ import CreateDistristributedTransactionCommand from "../../commands/DistributedT
 import db from "../../../db/models/index.cjs";
 
 const eventName = "Put_Shopping_Cart_Product_Order";
+const type = Sagas.SagaHandler.types.COMPLETE;
 const cmdService = ModelCommandService();
 
-const idempotentMessageHandler = new IdempotentMessageHandler(
-    eventName, 
-    db
-);
-
-const handler = new Saga.handler({ 
-    eventName, 
-    type: Saga.types.COMPLETE
-}, Sagas.BrokerService);
-
-const update = async (
-    params,
-    message_uuid,
-    distributed_transaction_transaction_uuid,
-    distributed_transaction_state_name,
-    transaction_message
-) => {
-    
-
-    
-}
-
+const idempotentMessageHandler = new Sagas.IdempotentMessageHandler( eventName, db );
+const handler = new Sagas.SagaHandler.handler({ eventName, type });
 
 handler.initiateEvent(async (
     distributed_transaction_transaction_uuid,
@@ -40,17 +19,18 @@ handler.initiateEvent(async (
 ) => {
     const { message_uuid, params } = response;
     const { product_order, product_order_entities } = params;
-    const transaction_message = "Send message to Put_Shopping_Cart_Product_Order completed";
-
-    if (message_uuid && await idempotentMessageHandler.existOrCreate(message_uuid)) {
-        console.log(`${eventName}, message_uuid already processed: `, message_uuid);
-        return;
-    }
-    console.log("Put_Shopping_Cart_Product_Order: ", params);
+    
     await db.sequelize.transaction(async (transaction) => {
+        if (message_uuid && await idempotentMessageHandler.existOrCreate(message_uuid, transaction)) {
+            console.log(`${eventName}, message_uuid already processed: `, message_uuid);
+            return;
+        }
+
         await cmdService.invoke(new CreateDistristributedTransactionCommand(distributed_transaction_transaction_uuid, {
             distributed_transaction_state_name,
-            transaction_message
+            transaction_message: JSON.stringify({ 
+                eventName, type, params, message_uuid 
+            })
         }), { transaction });
     
         await cmdService.invoke(new PutCommand(product_order.client_side_uuid, {

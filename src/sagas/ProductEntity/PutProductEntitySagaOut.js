@@ -1,52 +1,43 @@
 import Sagas from "@vr-web-shop/sagas";
-import Saga from "../../../../saga-v2/SagaHandler.js";
-import IdempotentMessageHandler from "../../../../idempotent-message-handler/IdempotentMessageHandler.js";
 import ModelCommandService from "../../services/ModelCommandService.js";
 import PutCommand from "../../commands/ProductEntity/PutCommand.js";
+import CreateDistributedTransactionCommand from "../../commands/DistributedTransaction/CreateCommand.js";
 import db from "../../../db/models/index.cjs";
 
 const eventName = "Put_Products_Product_Entity";
+const type = Sagas.SagaHandler.types.START;
 const cmdService = ModelCommandService();
 
-const idempotentMessageHandler = new IdempotentMessageHandler(
-    eventName, 
-    db
-);
-
-const handler = new Saga.handler({ 
-    eventName, 
-    type: Saga.types.START
-}, Sagas.BrokerService);
+const idempotentMessageHandler = new Sagas.IdempotentMessageHandler( eventName, db );
+const handler = new Sagas.SagaHandler.handler({ eventName, type });
 
 const update = async (
     params,
     message_uuid,
     distributed_transaction_transaction_uuid,
     distributed_transaction_state_name,
-    transaction_message
 ) => {
-    if (message_uuid && await idempotentMessageHandler.existOrCreate(message_uuid)) {
-        console.log("Put Products Product Entity, message_uuid already processed: ", message_uuid);
-        return;
-    }
+    await db.sequelize.transaction(async (transaction) => {
+        if (message_uuid && await idempotentMessageHandler.existOrCreate(message_uuid, transaction)) {
+            console.error(`${eventName}, message_uuid already processed: `, message_uuid);
+            return;
+        }
 
-    await cmdService.invoke(new PutCommand(params.client_side_uuid, {
-        product_entity_state_name: params.product_entity_state_name,
-        product_client_side_uuid: params.product_client_side_uuid,
-        distributed_transaction_transaction_uuid
-    }), {
-        beforeTransactions: [
-            async (db, t, pk, params) => {
-                await db["DistributedTransaction"].create(
-                    { 
-                        transactionUUID: distributed_transaction_transaction_uuid,
-                        distributed_transaction_state_name,
-                        transaction_message
-                    },
-                    { transaction: t }
-                );
+        await cmdService.invoke(new CreateDistributedTransactionCommand(
+            distributed_transaction_transaction_uuid, 
+            { 
+                distributed_transaction_state_name,
+                transaction_message: JSON.stringify({ 
+                    eventName, type, params, message_uuid 
+                })
             }
-        ]
+        ), { transaction });
+    
+        await cmdService.invoke(new PutCommand(params.client_side_uuid, {
+            product_entity_state_name: params.product_entity_state_name,
+            product_client_side_uuid: params.product_client_side_uuid,
+            distributed_transaction_transaction_uuid
+        }), { transaction });
     });
 }
 
@@ -61,7 +52,6 @@ handler.initiateEvent(async (
         null,
         distributed_transaction_transaction_uuid, 
         distributed_transaction_state_name,
-        "Send message to Put Products Product Entity"
     );
 
     return params;
@@ -77,7 +67,6 @@ handler.onCompleteEvent(async (
         response.message_uuid,
         distributed_transaction_transaction_uuid, 
         distributed_transaction_state_name,
-        "Put Products Product Entity completed"
     );
 });
 
@@ -89,12 +78,13 @@ handler.onReduceEvent(async (
     await update({
             client_side_uuid: response.params.client_side_uuid,
             product_entity_state_name: 'SYSTEM_FAILURE',
-            product_client_side_uuid: response.params.product_client_side_uuid
+            product_client_side_uuid: response.params.product_client_side_uuid,
+            ...response.error
         },
         response.message_uuid,
         distributed_transaction_transaction_uuid, 
         distributed_transaction_state_name,
-        response.error
+        
     );
 });
 
