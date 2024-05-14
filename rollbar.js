@@ -1,5 +1,5 @@
 import Rollbar from "rollbar";
-/*
+
 const rollbar = new Rollbar({
     accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
     captureUncaught: true,
@@ -14,12 +14,3 @@ const rollbar = new Rollbar({
 });
 
 export default rollbar;
-*/
-export default {
-  error: (error) => {
-    console.log('error', error);
-  },
-  info: (message, data) => {
-    console.log('info', message);
-  },
-}
