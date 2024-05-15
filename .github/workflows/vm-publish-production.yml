@@ -48,6 +48,6 @@ jobs:
         script: |
           cd ${{ secrets.SERVER_LOCATION }}/github/workspace
           docker build -t ${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} .
-          docker save ${{ secrets.IMAGE_NAME }} > ${{ secrets.IMAGE_NAME }}.tar
-          microk8s ctr image import ${{ secrets.IMAGE_NAME }}.tar
+          k3d image import ${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
           kompose convert -o ./kubernetes/
+          kubectl apply -f kubernetes/
