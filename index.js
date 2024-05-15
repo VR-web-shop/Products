@@ -21,15 +21,20 @@ import cors from 'cors';
      */
     const app = express();
     const port = process.env.SERVER_PORT;
-    const origins = process.env.CORS_ORIGINS.split(',');
+    const corsOrigins = process.env.CORS_ORIGINS.split(',')
 
+    app.use(cors({
+        origin: corsOrigins,
+        credentials: true // Allow credentials (including cookies)
+    }));
+    
     /**
      * Configure express
      */
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
-    //app.use(rollbar.errorHandler())
-    origins.forEach(origin => app.use(cors({ origin })));
+    app.use(rollbar.errorHandler())
+    
 
     /**
      * Add GraphQL endpoint
