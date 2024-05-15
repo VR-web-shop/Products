@@ -15,9 +15,13 @@ jobs:
           node-version: 18
       - name: Create .env file
         run: echo "${{ secrets.ENV_FILE }}" > .env    
+      - name: Create .npmrc file
+        run: echo "${{ secrets.NPMRC_FILE }}" > .npmrc   
       - run: npm ci
       - name: Remove .env file
         run: rm .env
+      - name: Remove .npmrc file
+        run: rm .npmrc
   deploy:
     needs: 
       - build
