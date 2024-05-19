@@ -21,11 +21,10 @@ import cors from 'cors';
      */
     const app = express();
     const port = process.env.SERVER_PORT;
-    const corsOrigins = process.env.CORS_ORIGINS.split(',')
+    const origin = process.env.CORS_ORIGINS.split(',');
 
     app.use(cors({
-        origin: corsOrigins,
-        credentials: true // Allow credentials (including cookies)
+        origin: '*'
     }));
     
     /**
