@@ -51,6 +51,19 @@ import cors from 'cors';
      * Start server
      */
     app.listen(port, () => {
-        console.log(`Server is running on http://localhost:${port}`);
+        console.log(`
+            === Products Service ===
+            Server: Express
+            Port: ${port}
+
+            === Swagger Docs ===
+            URL: http://localhost:${port}/api/v1/documentation
+
+            === GraphQL ===
+            URL: http://localhost:${port}/graphql
+    
+            === Rollbar ===
+            Enabled: ${rollbar.client.options.enabled}
+        `);
     });
 })();
