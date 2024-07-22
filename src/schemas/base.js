@@ -40,6 +40,9 @@ import ValutaSettingMutation from "./ValutaSetting/mutation.js";
 import ValutaSettingQuery from "./ValutaSetting/query.js";
 import ValutaSettingTypeDef from "./ValutaSetting/typeDef.js";
 
+import HealthQuery from "./Health/query.js";
+import HealthTypeDef from "./Health/typeDef.js";
+
 const typeDefs = mergeTypeDefs([
     ProductTypeDef,
     DeliverOptionTypeDef,
@@ -51,6 +54,7 @@ const typeDefs = mergeTypeDefs([
     ProductOrderStateTypeDef,
     ValutaSettingTypeDef,
     RequestErrorTypeDef,
+    HealthTypeDef,
 ]);
 
 const resolvers = mergeResolvers([
@@ -72,6 +76,7 @@ const resolvers = mergeResolvers([
     ProductOrderStateMutation,
     ValutaSettingQuery,
     ValutaSettingMutation,
+    HealthQuery,
 ]);
 
 const schema = makeExecutableSchema({ 
