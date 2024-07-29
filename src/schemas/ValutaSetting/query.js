@@ -11,10 +11,8 @@ const resolvers = {
   Query: {
     valutaSettings: async (_, { limit, page }, context) => {
         try {
-            return await Restricted({ context, permission: 'valuta-settings:index' }, async () => {
-                const { rows, pages, count } = await service.invoke(new ReadCollectionQuery({ limit, page }));
-                return { __typename: 'ValutaSettings', rows, pages, count };
-            })
+            const { rows, pages, count } = await service.invoke(new ReadCollectionQuery({ limit, page }));
+            return { __typename: 'ValutaSettings', rows, pages, count };
         } catch (error) {
             if (error instanceof RequestError) {
 				rollbar.info('RequestError', { code: error.code, message: error.message })
